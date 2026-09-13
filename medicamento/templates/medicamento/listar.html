@@ -1,0 +1,43 @@
+{% include "base/partials/head.html" %}
+
+  <body id="body" class="main-bg main-content">
+
+    {% include "base/partials/message.html" %}
+
+    <section id="lista-medicamento" class="main-content section-page">
+      <div>
+        <h3>Medicamentos Cadastrados</h3>
+      </div>
+      <div>
+        <table class="tabela">
+          <thead>
+            <tr>
+              <th>Nome</th>
+              <th>Fabricante</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {% for medicamento in medicamentos %}
+            <tr>
+              <td>{{ medicamento.nome }}</td>
+              <td>{{ medicamento.fabricante }}</td>
+              <td>
+                <a href="{% url 'medicamento:atualizar' medicamento.id %}" class="btn-editar" onclick="return confirm('ATENÇÃO: Deseja realmente EDITAR o medicamento &quot;{{ medicamento.nome }}&quot;?')">Editar</a>
+                <a href="{% url 'medicamento:deletar' medicamento.id %}" class="btn-excluir" onclick="return confirm('ATENÇÃO: Deseja realmente EXCLUIR o medicamento &quot;{{ medicamento.nome }}&quot;?')">Excluir</a>
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="3" class="td-colspan">Nenhum medicamento cadastrado até o momento.</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        <span class="span">{{ medicamentos|length }} registros</span>
+        <a href="{% url 'base:index' %}" class="link-voltar">Voltar para a Home</a>
+      </div>
+    </section>
+  </body>
+</html>

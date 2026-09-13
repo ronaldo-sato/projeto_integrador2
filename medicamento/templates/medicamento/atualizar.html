@@ -1,0 +1,40 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8">
+    <title>Editar Medicamento | {{ medicamento.nome }}</title>
+    <link rel="stylesheet" href="{% static 'css/global.css' %}">
+    <link rel="stylesheet" href="{% static 'css/forms.css' %}">
+    <link rel="stylesheet" href="{% static 'css/tables.css' %}">
+    <link rel="stylesheet" href="{% static 'css/atualizar.css' %}">
+  </head>
+
+  <body id="body">
+
+    <section class="section-page">
+
+      <div class="main-content div-editar">
+        <h3>Editar Registro</h3>
+        
+        <form class="formulario" action="{% url 'medicamento:atualizar' medicamento.id %}" method="POST">
+          {% csrf_token %}
+          <p>
+            <label for="nome-medicamento">Nome do Medicamento:</label>
+            <input type="text" id="nome-medicamento" name="nome_medicamento" value="{{ medicamento.nome }}" required>
+          </p>
+          <p>
+            <label for="fabricante">Fabricante:</label>
+            <input type="text" id="fabricante" name="fabricante" value="{{ medicamento.fabricante }}" required>
+          </p>
+          <p>
+            <button type="submit" class="button">Alterar</button>
+          </p>
+        </form>
+        <br>
+        <a href="{% url 'medicamento:listar' %}" class="link-voltar">Cancelar e Voltar</a>
+      </div>
+    </section>
+
+  </body>
+</html>
