@@ -1,0 +1,70 @@
+<!--Cadastro Preço-->
+<section id="preco" class="main-content section-page">
+    <div>
+    <h2>Cadastro de Preço</h2>
+    <form id="formulario-preco" class="formulario" action="{% url 'preco:cadastrar' %}" method="POST">
+        {% csrf_token %}
+        <fieldset class="fieldset">
+        <legend>Preencha</legend>
+        <p>
+            <label for="select-medicamento">Medicamento:</label>
+            <select id="select-medicamento" name="medicamento_nome">
+            {% if medicamentos_unicos %}
+                <option value="">Selecione um medicamento</option>
+                {% for medicamento in medicamentos_unicos %}
+                    <!-- Para manter o estado: medicamento_selecionado -->
+                    <option value="{{ medicamento.nome }}" {% if medicamento.nome == medicamento_selecionado %}selected{% endif %}>
+                    {{ medicamento.nome }}
+                    </option>
+                {% endfor %}
+            {% else %}
+                <option value="" disabled selected>Não há medicamento cadastrado</option>
+            {% endif %}
+            </select>
+            <p>
+            <button type="submit" class="button" name="acao_botao" value="filtrar">Filtrar Marcas</button>
+            </p>
+        </p>
+        <p>
+            <label for="select-fabricante">Fabricante:</label>
+            <select id="select-fabricante" name="medicamento_id">
+            {% if fabricantes_filtrados %}
+                <option value="">Filtre as marcas (botão Filtrar acima)</option>
+                {% for medicamento in fabricantes_filtrados %}
+                    <option value="{{ medicamento.id }}">
+                    {{ medicamento.fabricante }}
+                    </option>
+                {% endfor %}
+            {% else %}
+                <option value="" disabled selected>Filtre primeiro as marcas.</option>
+            {% endif %}
+            </select>
+        </p>
+        <p>
+            <label for="valor-preco">Preço R$:</label>
+            <!-- preço não requerido, a necessidade está sendo tratada na view -->
+            <input type="text" id="valor-preco" name="valor_preco" value="{{ preco_digitado|default:'' }}" placeholder="Valor">
+        </p>
+        <p> <!-- listar apenas farmácias com preço cadastrado -->
+            <label for="select-farmacia">Farmácia:</label>
+            <select id="select-farmacia" name="farmacia_id">
+            {% if farmacias %}
+                <option value="">Selecione uma farmácia</option>
+                {% for farmacia in farmacias %}
+                    <option value="{{ farmacia.id }}" {% if farmacia.id|stringformat:"s" == farmacia_selecionada_id %}selected{% endif %}>
+                    {{ farmacia.nome }}
+                    </option>
+                {% endfor %}
+            {% else %}
+                <option value="" disabled selected>Não há farmácia cadastrada</option>
+            {% endif %}
+            </select>
+        </p>
+        <p>
+            <button type="reset" class="button">Limpar</button>
+            <button type="submit" class="button">Cadastrar</button>
+        </p>
+        </fieldset>
+    </form>
+    </div>
+</section>

@@ -1,0 +1,8 @@
+# No Django, para iniciar um projeto <nomeProjeto> na pasta do projeto <.>:
+
+django-admin startproject nomeProjeto . 
+
+### OBS: se não usar . cria uma pasta nomeProjeto dentro da pasta do
+projeto (fica "duplicado").
+
+

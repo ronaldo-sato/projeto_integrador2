@@ -1,0 +1,57 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pesquisa de Preços</title>
+    <link href="https://googleapis.com" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/global.css' %}">
+    <link rel="stylesheet" href="{% static 'css/tables.css' %}">
+  </head>
+
+  <body id="body" class="main-bg">
+
+    <section class="main-content section-page">
+      <div>
+        {% if precos %}
+          <h2>Preços encontrados para: "{{ medicamento_nome }}"</h2>
+        {% else %}
+          <h2>Nenhum preço cadastrado para "{{ medicamento_nome }}"</h2>
+        {% endif %}
+        <table class="tabela">
+          <thead>
+            <tr>
+              <th>Fabricante</th>
+              <th>Farmácia</th>
+              <th>Endereço</th>
+              <th>Preço</th>
+              <th>Data e Hora</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for preco in precos %}
+              <tr class="{% if preco.preco|floatformat:2 == menor_preco|floatformat:2 %}preco-destaque{% endif %}">
+                <td>{{ preco.medicamento.fabricante }}</td>
+                <td>{{ preco.farmacia.nome }}</td>
+                <td>{{ preco.farmacia.endereco }}</td>
+                <!-- Destacar apenas o menor preço (usa a classe de destaque) -->
+                {% comment %} <td class="{% if preco.preco == menor_preco %}preco-destaque{% endif %}"> {% endcomment %}
+                <td>R$ {{ preco.preco }}</td>
+                <td>{{ preco.data_hora|date:"d/m/Y H:i" }}</td>
+              </tr>
+            {% empty %}
+              <tr>
+                <td colspan="5">Nenhum resultado encontrado.</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        <p>
+          <a href="{% url 'base:index' %}#pesquisa" class="link-voltar">Voltar para Pesquisa</a>
+        </p>
+      </div>
+    </section>
+
+  </body>
+</html>

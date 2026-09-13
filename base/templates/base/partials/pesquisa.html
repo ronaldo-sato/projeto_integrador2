@@ -1,0 +1,31 @@
+<!--Pesquisa Preços-->
+<section id="pesquisa" class="main-content section-page">
+    <div>
+    <h2>Pesquisa de Preço</h2>
+    <form id="formulario-pesquisa" class="formulario" action="{% url 'pesquisa:precos' %}" method="POST">
+        {% csrf_token %}
+        <fieldset class="fieldset">
+        <legend>Preencha</legend>
+        <p>
+            <label for="select-medicamento-pesquisa">Medicamento:</label>
+            <select id="select-medicamento-pesquisa" name="medicamento_nome">
+                <option value="">Selecione um medicamento</option>
+                {% if medicamentos_unicos %}
+                {% for medicamento in medicamentos_unicos %}
+                    <option value="{{ medicamento.nome }}">
+                        {{ medicamento.nome }}
+                    </option>
+                {% endfor %}
+                {% else %}
+                <option value="" disabled selected>Não há medicamento cadastrado</option>
+                {% endif %}
+            </select>
+        </p>
+        <p>
+            <button type="reset" class="button">Limpar</button>
+            <button type="submit" class="button">Pesquisar</button>
+        </p>
+        </fieldset>
+    </form>
+    </div>
+</section>

@@ -1,0 +1,51 @@
+{% include "base/partials/head.html" %}
+
+  <body id="body" class="main-bg main-content">
+
+    {% include "base/partials/message.html" %}
+
+    <section id="lista-preco" class="main-content section-page">
+      <div>
+        <h3>Preços Cadastrados</h3>
+      </div>
+      <div>
+        <table class="tabela">
+          <thead>
+            <tr>
+              <th>Medicamento</th>
+              <th>Fabricante</th>
+              <th>Farmácia</th>
+              <th>Endereço</th>
+              <th>Preço</th>
+              <th>Data e Hora</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {% for preco in precos %}
+            <tr>
+              <td>{{ preco.medicamento.nome }}</td>
+              <td>{{ preco.medicamento.fabricante }}</td>
+              <td>{{ preco.farmacia.nome }}</td>
+              <td>{{ preco.farmacia.endereco }}</td>
+              <td>R$ {{ preco.preco }}</td>
+              <td>{{ preco.data_hora|date:"d/m/Y H:i" }}</td>
+              <td>
+                <a href="{% url 'preco:atualizar' preco.id %}" class="btn-editar" onclick="return confirm('ATENÇÃO: Deseja realmente EDITAR o preco &quot;{{ preco.nome }}&quot;?')">Editar</a>
+                <a href="{% url 'preco:deletar' preco.id %}" class="btn-excluir" onclick="return confirm('ATENÇÃO: Deseja realmente EXCLUIR o preco &quot;{{ preco.nome }}?&quot;')">Excluir</a>
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="7" class="td-colspan">Nenhum preco cadastrado até o momento.</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        <span class="span">{{ precos|length }} registros</span>
+        <a href="{% url 'base:index' %}" class="link-voltar">Voltar para a Home</a>
+      </div>
+    </section>
+  </body>
+</html>

@@ -1,0 +1,119 @@
+/* base/static/base/css/forms.css -> base_static/global/css/forms.css */
+/* Padronizar forms e elementos associados */
+
+:root {
+  --success-color: #145924;
+  --success-bg: #cce9d3;
+  --success-border: #84ab8e;
+  --error-color: #741720;
+  --error-bg: #f3d4d6;
+  --error-border: #cfaaad;
+  --warning-color: #807700;
+  --warning-bg: #ebe9d4;
+  --warning-border: #cfcc88;
+}
+
+form {
+  display: inline-block; /* bloqueando a caixa do formulário */
+  text-align: left;      /* texto alinhado à esquerda */
+  max-width: 90vh;       /* ajustando largura */
+  width: 100%;           /* */
+  margin-top: 0rem;    /* espaçamento para o topo */
+}
+
+.formulario p {
+    margin-bottom: .5rem; /* espaçamento vertical entre os <p>s dos formulários */
+}
+
+.button {
+  padding: 0.3rem; /* espaçamento interno do botão */
+}
+
+.fieldset {
+  padding: .7rem;         /* espaçamento interno */
+  border-radius: 0.5rem; /* arredondamento de borda */
+}
+
+/* Selecionando tipos de entrada por atributos */
+/* Incluindo o select para padronizar */
+select, 
+input[type="text"], 
+input[type="email"],
+input[type="datetime-local"] {
+    width: 100%;             /* ocupar a largura do contêiner */
+    padding: .8rem;          /* espaçamento interno entre texto e borda */
+    box-sizing: border-box;  /* garantir que padding não aumente o tamanho final do campo */
+    display: block;          /* cada campo ocupa uma linha */
+    margin-bottom: 1rem;     /* espaçamento entre os campos */
+    font-family: inherit;    /* herdando fontes definidas no global */
+}
+
+.data-hora {
+    display: flex;          /* Colocar label e input lado a lado */
+    align-items: center;    /* Alinhamento vertical do texto na caixa */
+    gap: 1rem;              /* Espaçamento entre texto e caixa */
+}
+
+.data-hora label {
+    margin-bottom: 0;       /* Removendo margens */
+    white-space: nowrap;    /* Sem quebra de linha após texto */
+}
+
+.data-hora input {
+    width: auto;            /* Para caixa se ajustar ao tamanho */
+    display: inline-block;  /* Bloquear ao lado do label */
+    margin-bottom: 0;       /* Removendo o espaçamento inferior */
+    flex-grow: 0;           /* Não permitir que a caixa estique */
+}
+
+/* Para mensagens de feedback ao lado dos botões */
+.mensagem-feedback {
+    margin-left: 1rem;      /* espaçamento horizontal em relação ao botão */
+    font-size: 1.2rem;      /* para ser discreta */
+    font-weight: bold;      /* mas destacar a visualização */
+    display: inline-block;  /* bloquear ao lado dos botões */
+    vertical-align: middle; /* alinhamento vertical em relação ao botão */
+}
+
+/* Container para a mensagem no topo */
+.conteiner-mensagens {
+    margin-top: var(--gap);
+    padding-top: 2rem;
+    width: 100%;
+    padding: 1rem 0;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Caixa de alerta */
+.alert {
+    display: inline-block;
+    padding: 1.5rem 3rem;
+    border-radius: 0.4rem;
+    margin: 1 0rem;
+    font-weight: bold;
+    font-size: 1rem;
+    box-shadow: 0 0.2rem 0.5rem rgba(0, 0, 0, 0.1);
+}
+
+/* Cores para o sucesso (tag 'success' no Django) */
+.alert-success {
+    color: var(--success-color);
+    background-color: var(--success-bg);
+    border: 1px solid var(--success-border);
+}
+
+/* Cores para erro (tg 'error' no Django) */
+.alert-error {
+    color: var(--error-color);
+    background-color: var(--error-bg);
+    border: 1px solid var(--error-border);
+}
+
+.alert-warning {
+    color: var(--warning-color);
+    background-color: var(--warning-bg);
+    border: 1px solid var(--warning-border);
+}

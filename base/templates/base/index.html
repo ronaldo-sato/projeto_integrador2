@@ -1,0 +1,48 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% comment %} <title>Projeto Integrador 1</title> {% endcomment %}
+    <title>{% block title %}{{ titulo }}{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+    href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap"
+    rel="stylesheet">
+    <!-- Leitura de arquivo.css com Django (tag static: o caminho é relativo) -->
+    {% comment %} <link rel="stylesheet" href="{% static 'css/global.css' %}"> {% endcomment %}
+    <link rel="stylesheet" href="{% static 'global/css/global.css' %}">
+    <link rel="stylesheet" href="{% static 'global/css/forms.css' %}">
+  </head>
+
+  <body id="body" class="main-bg main-content">
+
+    {% include "base/partials/message.html" %}
+
+    <!--Menu de Navegação-->
+    {% include "base/partials/menu.html" %}
+
+    <!--Home-->
+    {% include "base/partials/home.html" %}
+    
+    <!--Cadastro Farmácia-->
+    {% include "base/partials/farmacia.html" %}
+
+    <!--Cadastro Medicamento-->
+    {% include "base/partials/medicamento.html" %}
+  
+    <!--Cadastro Preço-->
+    {% include "base/partials/preco.html" %}
+
+    <!--Pesquisa Preços-->
+    {% include "base/partials/pesquisa.html" %}
+
+    <!--Sobre-->
+    {% include "base/partials/sobre.html" %}
+
+  </body>
+</html>

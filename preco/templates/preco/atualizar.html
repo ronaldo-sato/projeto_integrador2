@@ -1,0 +1,36 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8">
+    <title>Editar Preço | {{ preco.preco }}</title>
+    <link rel="stylesheet" href="{% static 'css/global.css' %}">
+    <link rel="stylesheet" href="{% static 'css/forms.css' %}">
+    <link rel="stylesheet" href="{% static 'css/tables.css' %}">
+    <link rel="stylesheet" href="{% static 'css/atualizar.css' %}">
+  </head>
+
+  <body id="body">
+
+    <section class="main-content section-page">
+
+      <div class="div-editar">
+        <h3>Editar Registro:</h3>
+        <p>{{preco.medicamento.nome}} registrado às {{ preco.data_hora|date:'d/m/Y H:i' }}</p>        
+        <form action="{% url 'preco:atualizar' preco.id %}" method="POST">
+          {% csrf_token %}
+          <p>
+            <label for="valor-preco">Preco R$:</label>
+            <input type="text" id="valor-preco" name="valor_preco" value="{{ preco.preco }}" required>
+          </p>
+          <p>
+            <button type="submit" class="button">Alterar</button>
+          </p>
+        </form>
+        <br>
+        <a href="{% url 'preco:listar' %}" class="link-voltar">Cancelar e Voltar</a>
+      </div>
+    </section>
+
+  </body>
+</html>

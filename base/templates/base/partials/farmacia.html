@@ -1,0 +1,25 @@
+<!--Cadastro Farmácia-->
+<section id="farmacia" class="main-content section-page">
+    <div>
+    <h2>Cadastro de Farmácia</h2>
+    <!-- No Django chamar template (usando namespacing): nome_app:nome_url -->
+    <form id="formulario-farmacia" class="formulario" action="{% url 'farmacia:cadastrar' %}" method="POST">
+        {% csrf_token %}
+        <fieldset class="fieldset">
+        <legend>Preencha</legend>
+        <p>
+            <label for="nome-farmacia">Nome:</label>
+            <input type="text" id="nome-farmacia" name="nome_farmacia" placeholder="Estabelecimento" required>
+        </p>
+        <p>
+            <label for="endereco">Endereço:</label>
+            <input type="text" id="endereco" name="endereco" placeholder="Endereço" required>
+        </p>
+        <p class="button">
+            <button type="reset" class="button">Limpar</button>
+            <button type="submit" class="button">Cadastrar</button>
+        </p>
+        </fieldset>
+    </form>
+    </div>
+</section>

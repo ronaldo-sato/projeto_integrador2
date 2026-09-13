@@ -1,0 +1,108 @@
+/* base/static/base/css/tables.css -> base_static/global/css/tables.css */
+/* Padronizar tabelas */
+
+:root {
+  --tabela-bg: #f5f6f6;
+  --th-bg: #d1e4e4;
+  --tr-hover-bg: #e5eeee;
+  --td-border: #929595;
+  --btn-border: #547474;
+  --btn-hover: #2c4646;
+  --color-link: #555555;
+  --destaque-color: #2b8230;
+  --destaque-bg: #daf7dd;;
+}
+
+.tabela {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+  font-family: 'Open Sans', sans-serif;
+  font-size: 1.3rem;
+  background-color: var(--tabela-bg); 
+  color: var(--back);
+}
+
+.tabela th {
+  background-color: var(--th-bg);
+  color: var(--back);
+  padding: 1rem;
+  text-align: center;
+  font-family: 'Montserrat', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: .05rem;
+  /* font-weight: bold; */
+}
+
+.tabela td {
+  padding: 1rem;
+  border-bottom: 0.1rem solid var(--td-border);
+  vertical-align: middle;
+}
+
+.tabela tr:hover {
+  background-color: var(--tr-hover-bg);
+}
+
+.span {
+  display: block;
+  /* background-color: var(--primary-color); */
+  padding: .3rem .8rem;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  border-radius: 4px;
+  text-align: center;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 1.3rem;
+  font-weight: bold;
+}
+
+.td-colspan {
+  text-align: center;
+  padding: 3rem;
+  color: var(--color-link);
+  font-style: italic;
+}
+
+.btn-editar,
+.btn-excluir {
+  display: inline-block;
+  text-align: center;
+  margin: 0 3px;
+  text-decoration: none;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  padding: 0.5rem 0.5rem;
+  transition: all 300ms ease-in-out;
+}
+
+.btn-editar:hover,
+.btn-excluir:hover {
+  background-color: var(--th-bg); 
+  border: 1px solid var(--btn -border);
+  color: var(--btn-hover);
+}
+
+.link-voltar {
+  display: inline-block;
+  margin-top: 1rem;
+  text-decoration: none;
+  font-size: 1.5rem;
+  color: var(--color-link);
+}
+
+.link-voltar:hover {
+  text-decoration: underline;
+}
+
+.preco-destaque {
+  color: var(--destaque-color);
+  background-color: var(--destaque-bg);
+  font-weight: bold;
+}
+
+.preco-destaque td {
+  color: var(--destaque-color);
+  background-color: var(--destaque-bg);
+  font-weight: bold;
+}
