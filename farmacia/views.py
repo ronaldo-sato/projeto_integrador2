@@ -1,5 +1,6 @@
 from django.contrib import messages
 from django.shortcuts import redirect, render, get_object_or_404
+from django.urls import reverse
 
 from .models import Farmacia
 
@@ -79,6 +80,18 @@ def atualizar(request, id):
     title = 'Editar Farmácias'
     heading = 'Editar Registro'
 
+    # Criando urls dinamicamente
+    url_action = reverse('farmacia:atualizar', args=[farmacia.id])
+    url_href = reverse('farmacia:listar')
+
+    context = {
+        'farmacia': farmacia,
+        'title': title,
+        'heading': heading,
+        'url_action': url_action,
+        'url_href': url_href,
+    }
+
     # Se o usuário clicar em Salvar (POST)
     if request.method == 'POST':
         # Pega dados do formulário
@@ -90,13 +103,7 @@ def atualizar(request, id):
             # Mensagem de erro (vazios)
             messages.error(request, "Erro: Nome ou Endereço é obrigatório.")
             # Renderiza edição
-            return render(
-                # request, 'farmacia/atualiza.html', {'farmacia': farmacia})
-                request,
-                'farmacia/atualizar.html',
-                {'farmacia': farmacia,
-                 'title': title,
-                 'heading': heading})
+            return render(request, 'farmacia/atualizar.html', context)
 
         # (Apenas se nome mudou) Verifica duplicidade:
         # Não pode duas farmácias com mesmo nome
@@ -107,12 +114,7 @@ def atualizar(request, id):
                 request,
                 f'Já existe outra farmácia com o nome "{nome_novo}".')
             # Renderiza para edição
-            return render(
-                request,
-                'farmacia/atualiza.html',
-                {'farmacia': farmacia,
-                 'title': title,
-                 'heading': heading})
+            return render(request, 'farmacia/atualizar.html', context)
 
         # Se os campos continuarem iguais, mas apenas clicar
         # no botão Alterar
@@ -139,8 +141,4 @@ def atualizar(request, id):
         return redirect('farmacia:listar')
 
     # Se clicar em Editar, exibe o formulário com os dados atuais
-    return render(request,
-                  'farmacia/atualiza.html',
-                  {'farmacia': farmacia,
-                   'title': title,
-                   'heading': heading})
+    return render(request, 'farmacia/atualizar.html', context)

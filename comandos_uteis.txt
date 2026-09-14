@@ -5,4 +5,21 @@ django-admin startproject nomeProjeto .
 ### OBS: se não usar . cria uma pasta nomeProjeto dentro da pasta do
 projeto (fica "duplicado").
 
+### OBS: Criado o Projeto, o coração do Django é settings.py
+
+# Django vive de apps, para criar um:
+
+python manage.py startapp nomeApp
+
+### OBS: manage.py basicamente faz tudo que django-admin, enquanto que este segundo é usado para criar o projeto (cria manage.py), depois em geral utiliza-se somente manage.py
+
+# Comandos disponíveis:
+
+python manage.py --help
+
+# Após criar um model é preciso migrá-lo para o banco de dados:
+
+python manage.py makemigrations
+python manage.py migrate
+
 

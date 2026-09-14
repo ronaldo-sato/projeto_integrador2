@@ -1,0 +1,21 @@
+{% block content %}
+
+	<section class="section-page">
+
+		<div class="main-content div-editar">
+      <h3>{% block h3 %}{{ titulo }}{% endblock h3 %}</h3>
+
+        <form class="formulario" action="{{ url_action }}" method="POST">
+          {% csrf_token %}
+          {% block formulario %}
+          
+          {% endblock formulario %}
+          <p>
+            <button type="submit" class="button">Alterar</button>
+          </p>
+          <br>    
+          <a href="{{ url_href }}" class="link-voltar">Cancelar e Voltar</a>
+		</div>
+	</section>
+
+{% endblock content %}
