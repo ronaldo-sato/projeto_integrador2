@@ -39,6 +39,7 @@ form {
 select, 
 input[type="text"], 
 input[type="email"],
+input[type="password"],
 input[type="datetime-local"] {
     width: 100%;             /* ocupar a largura do contêiner */
     padding: .8rem;          /* espaçamento interno entre texto e borda */
