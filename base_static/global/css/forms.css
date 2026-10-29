@@ -11,6 +11,7 @@
   --warning-color: #807700;
   --warning-bg: #ebe9d4;
   --warning-border: #cfcc88;
+  --tab-color: #777;
 }
 
 form {
@@ -117,4 +118,80 @@ input[type="datetime-local"] {
     color: var(--warning-color);
     background-color: var(--warning-bg);
     border: 1px solid var(--warning-border);
+}
+
+/* Escurecer fundo da tela no Pop-up */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Fundo preto semi-transparente */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;                          /* Ficar acima do menu (fixed; z-index: 100) */
+}
+
+/* Caixa do formulário */
+.modal-content {
+    background-color: var(--primary-color); /* definido em global.css */
+    padding: 3rem;
+    border-radius: 0.5rem;                  /* Mantendo o padrão do fieldset */
+    max-width: 45rem;
+    width: 90%;
+    position: relative;
+    box-shadow: 0 0.4rem 1rem rgba(0, 0, 0, 0.15);
+    color: var(--black);                   /* definido em global.css */
+}
+
+/* Botão X para fechar no canto superior direito */
+.close-modal {
+    position: absolute;
+    top: 1rem;
+    right: 1.5rem;
+    font-size: 3rem;
+    cursor: pointer;
+    color: var(--tab-color);
+    line-height: 1;
+    font-family: "Montserrat", sans-serif; /* Fonte de headings */
+    transition: color 300ms ease-in-out;
+}
+.close-modal:hover {
+    color: var(--error-color); /* Usando cor de erro para o hover de fechar */
+}
+
+/* Abas de navegação interna do modal */
+.auth-tabs {
+    display: flex;
+    margin-bottom: 1.5rem;
+    border-bottom: 0.1rem solid var(--tab-color);
+}
+
+.auth-tab {
+    flex: 1;
+    padding: 1rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 1.8rem;
+    font-family: "Montserrat", sans-serif; /* Fonte de cabeçalhos */
+    color: var(--tab-color);
+    transition: all 300ms ease-in-out;
+}
+
+/* Aba ativa ganha destaque */
+.auth-tab.active {
+    border-bottom: 0.2rem solid var(--success-color);
+    color: var(--success-color);
+}
+
+/* Espaçamento para os botões da Landing Page */
+.cta-buttons {
+    margin-top: 2rem;
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
 }
