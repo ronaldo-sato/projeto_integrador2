@@ -29,17 +29,19 @@
     <!--Home-->
     {% include "base/partials/home.html" %}
     
-    <!--Cadastro Farmácia-->
-    {% include "base/partials/farmacia.html" %}
+    {% if user.is_authenticated %}
+      <!--Cadastro Farmácia-->
+      {% include "base/partials/farmacia.html" %}
 
-    <!--Cadastro Medicamento-->
-    {% include "base/partials/medicamento.html" %}
-  
-    <!--Cadastro Preço-->
-    {% include "base/partials/preco.html" %}
+      <!--Cadastro Medicamento-->
+      {% include "base/partials/medicamento.html" %}
+    
+      <!--Cadastro Preço-->
+      {% include "base/partials/preco.html" %}
 
-    <!--Pesquisa Preços-->
-    {% include "base/partials/pesquisa.html" %}
+      <!--Pesquisa Preços-->
+      {% include "base/partials/pesquisa.html" %}
+    {% endif %}
 
     <!--Sobre-->
     {% include "base/partials/sobre.html" %}
