@@ -1,0 +1,330 @@
+/* Identidade visual da aplicação, aplicada sobre o Bootstrap 5.
+   Cores e espaçamentos ficam centralizados nas variáveis abaixo. */
+
+:root {
+  --cor-primaria: #0d9488;         /* verde-azulado (saúde) */
+  --cor-primaria-escura: #0f766e;
+  --cor-primaria-mais-escura: #115e59;
+  --cor-primaria-clara: #ccfbf1;
+  --cor-fundo: #f4f7f8;
+  --cor-destaque: #15803d;         /* menor preço */
+  --cor-destaque-fundo: #dcfce7;
+  --raio: 0.75rem;
+
+  --bs-primary: var(--cor-primaria);
+  --bs-primary-rgb: 13, 148, 136;
+  --bs-link-color: var(--cor-primaria-escura);
+  --bs-link-color-rgb: 15, 118, 110;
+  --bs-link-hover-color: var(--cor-primaria-mais-escura);
+  --bs-link-hover-color-rgb: 17, 94, 89;
+  --bs-border-radius: 0.5rem;
+  --bs-focus-ring-color: rgba(13, 148, 136, 0.25);
+}
+
+/* Fundo cinza só na página: cartões, campos e janelas continuam brancos
+   (eles usam a variável --bs-body-bg do Bootstrap) */
+body {
+  background-color: var(--cor-fundo);
+}
+
+/* Botões e campos na cor da aplicação */
+.btn-primary {
+  --bs-btn-bg: var(--cor-primaria);
+  --bs-btn-border-color: var(--cor-primaria);
+  --bs-btn-hover-bg: var(--cor-primaria-escura);
+  --bs-btn-hover-border-color: var(--cor-primaria-escura);
+  --bs-btn-active-bg: var(--cor-primaria-mais-escura);
+  --bs-btn-active-border-color: var(--cor-primaria-mais-escura);
+  --bs-btn-disabled-bg: var(--cor-primaria);
+  --bs-btn-disabled-border-color: var(--cor-primaria);
+  --bs-btn-focus-shadow-rgb: 13, 148, 136;
+}
+
+.btn-outline-primary {
+  --bs-btn-color: var(--cor-primaria-escura);
+  --bs-btn-border-color: var(--cor-primaria);
+  --bs-btn-hover-bg: var(--cor-primaria);
+  --bs-btn-hover-border-color: var(--cor-primaria);
+  --bs-btn-active-bg: var(--cor-primaria-escura);
+  --bs-btn-active-border-color: var(--cor-primaria-escura);
+  --bs-btn-focus-shadow-rgb: 13, 148, 136;
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: var(--cor-primaria);
+  box-shadow: 0 0 0 0.25rem var(--bs-focus-ring-color);
+}
+
+.nav-pills {
+  --bs-nav-pills-link-active-bg: var(--cor-primaria);
+}
+
+/* Menu */
+.navbar-brand {
+  color: var(--cor-primaria-mais-escura);
+}
+
+.marca-icone {
+  display: inline-grid;
+  place-items: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 0.6rem;
+  background: var(--cor-primaria);
+  color: #fff;
+  font-size: 1.15rem;
+}
+
+.navbar .nav-link {
+  border-radius: 0.5rem;
+  padding-inline: 0.75rem !important;
+}
+
+.navbar .nav-link.active {
+  color: var(--cor-primaria-mais-escura);
+  background: var(--cor-primaria-clara);
+  font-weight: 600;
+}
+
+/* Cartões */
+.card {
+  --bs-card-border-color: #e5eaec;
+  --bs-card-border-radius: var(--raio);
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04), 0 1px 3px rgba(16, 24, 40, 0.06);
+}
+
+.card-header {
+  background: #fff;
+  font-weight: 600;
+}
+
+/* Cabeçalho das páginas */
+.cabecalho-pagina h1 {
+  font-size: clamp(1.5rem, 2.5vw, 2rem);
+  font-weight: 700;
+}
+
+.icone-titulo {
+  display: inline-grid;
+  place-items: center;
+  width: 3rem;
+  height: 3rem;
+  border-radius: var(--raio);
+  background: var(--cor-primaria-clara);
+  color: var(--cor-primaria-mais-escura);
+  font-size: 1.4rem;
+  flex-shrink: 0;
+}
+
+/* Página inicial */
+.hero {
+  background: linear-gradient(135deg, var(--cor-primaria-mais-escura), var(--cor-primaria) 60%, #14b8a6);
+  color: #fff;
+}
+
+.hero .lead {
+  color: rgba(255, 255, 255, 0.88);
+}
+
+.passo-numero {
+  display: inline-grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  background: var(--cor-primaria-clara);
+  color: var(--cor-primaria-mais-escura);
+  font-weight: 700;
+}
+
+.card-atalho {
+  transition: transform 150ms ease, box-shadow 150ms ease;
+}
+
+.card-atalho:hover,
+.card-atalho:focus-within {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(16, 24, 40, 0.1);
+}
+
+.numero-grande {
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+/* Tabelas */
+.table > :not(caption) > * > * {
+  padding: 0.75rem 1rem;
+}
+
+.table thead th {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--bs-secondary-color);
+  background: #f8fafb;
+  white-space: nowrap;
+}
+
+.valor {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* Pesquisa: destaque do menor preço */
+.linha-menor-preco > * {
+  --bs-table-bg: var(--cor-destaque-fundo);
+}
+
+.linha-menor-preco .valor {
+  color: var(--cor-destaque);
+}
+
+.card-menor-preco {
+  border: 2px solid var(--cor-destaque);
+}
+
+.card-menor-preco .numero-grande {
+  color: var(--cor-destaque);
+}
+
+/* Tipos de estabelecimento: cada um com uma cor */
+.badge-tipo {
+  font-weight: 500;
+  border: 1px solid transparent;
+}
+.badge-tipo-farmacia     { background: #e0f2fe; color: #075985; }
+.badge-tipo-petshop      { background: #fce7f3; color: #9d174d; }
+.badge-tipo-agropecuaria { background: #ecfccb; color: #3f6212; }
+.badge-tipo-clinica      { background: #ede9fe; color: #5b21b6; }
+
+/* Escolha do tipo no formulário (botões de opção) */
+.opcoes-tipo .btn {
+  font-size: 0.875rem;
+  padding: 0.5rem 0.75rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Ícone de pata (SVG) da marca */
+.icone-pata {
+  width: 1.15em;
+  height: 1.15em;
+  vertical-align: -0.15em;
+}
+
+/* Sugestões do nome do medicamento (autocompletar) */
+.sugestoes {
+  position: absolute;
+  z-index: 1050;
+  left: 0;
+  right: 0;
+  margin-top: 0.25rem;
+  max-height: 22rem;
+  overflow-y: auto;
+}
+
+.sugestoes .list-group-item {
+  cursor: pointer;
+}
+
+.sugestoes .list-group-item.active {
+  background: var(--cor-primaria-clara);
+  border-color: var(--cor-primaria-clara);
+  color: inherit;
+}
+
+.selo-mapa {
+  background: #dcfce7;
+  color: #166534;
+}
+
+/* Ilustração do medicamento pela forma (desenhos em sprite_formas.html):
+   um quadrado colorido com o desenho; cada forma tem uma cor */
+.ilustracao {
+  display: inline-grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.6rem;
+  background: var(--fundo-forma);
+  color: var(--cor-forma);
+}
+
+.ilustracao svg {
+  width: 62%;
+  height: 62%;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.ilustracao-pequena { width: 2rem; height: 2rem; border-radius: 0.5rem; }
+.ilustracao-grande  { width: 4.5rem; height: 4.5rem; border-radius: var(--raio); }
+.ilustracao-grande svg { stroke-width: 1.4; }
+
+.ilustracao-vacina      { --fundo-forma: #ede9fe; --cor-forma: #6d28d9; }
+.ilustracao-diagnostico { --fundo-forma: #e2e8f0; --cor-forma: #334155; }
+.ilustracao-coleira     { --fundo-forma: #fef3c7; --cor-forma: #b45309; }
+.ilustracao-shampoo     { --fundo-forma: #e0f2fe; --cor-forma: #0369a1; }
+.ilustracao-spray       { --fundo-forma: #cffafe; --cor-forma: #0e7490; }
+.ilustracao-pipeta      { --fundo-forma: #fce7f3; --cor-forma: #be185d; }
+.ilustracao-injetavel   { --fundo-forma: #fee2e2; --cor-forma: #b91c1c; }
+.ilustracao-pomada      { --fundo-forma: #ffedd5; --cor-forma: #c2410c; }
+.ilustracao-gotas       { --fundo-forma: #dbeafe; --cor-forma: #1d4ed8; }
+.ilustracao-comprimido  { --fundo-forma: #ccfbf1; --cor-forma: #0f766e; }
+.ilustracao-capsula     { --fundo-forma: #dcfce7; --cor-forma: #15803d; }
+.ilustracao-po          { --fundo-forma: #fef9c3; --cor-forma: #a16207; }
+.ilustracao-liquido     { --fundo-forma: #e0e7ff; --cor-forma: #4338ca; }
+.ilustracao-medicamento { --fundo-forma: #f1f5f9; --cor-forma: #475569; }
+
+/* Estado vazio (listas sem registros) */
+.estado-vazio {
+  color: var(--bs-secondary-color);
+}
+
+.estado-vazio .bi {
+  font-size: 2.5rem;
+  opacity: 0.5;
+}
+
+/* Mensagens (toasts) abaixo do menu fixo */
+.mensagens {
+  margin-top: 4.5rem;
+  z-index: 1090;
+}
+
+.toast-success { background: #f0fdf4; color: #166534; }
+.toast-danger  { background: #fef2f2; color: #991b1b; }
+.toast-warning { background: #fffbeb; color: #92400e; }
+.toast-info    { background: #eff6ff; color: #1e40af; }
+
+.toast {
+  box-shadow: 0 8px 24px rgba(16, 24, 40, 0.12);
+}
+
+/* Confirmação de exclusão */
+.icone-alerta {
+  display: inline-grid;
+  place-items: center;
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 50%;
+  background: #fee2e2;
+  color: #b91c1c;
+  font-size: 1.5rem;
+}
+
+/* Rodapé */
+.rodape {
+  background: #fff;
+  border-top: 1px solid #e5eaec;
+  color: var(--bs-secondary-color);
+}

@@ -1,0 +1,30 @@
+# Configuração do deploy no Render (Blueprint). O Render lê este arquivo ao
+# criar o serviço: New > Blueprint > escolher o repositório. Passo a passo
+# no README (seção Deploy)
+services:
+  - type: web
+    name: comparador-vet
+    runtime: python
+    plan: free
+    # Mesma região do banco no Neon (AWS us-east-1, Virgínia do Norte):
+    # servidor e banco perto um do outro deixam as páginas mais rápidas
+    region: virginia
+    # Instala as dependências, junta os arquivos estáticos e atualiza as
+    # tabelas do banco a cada deploy
+    buildCommand: >-
+      pip install -r requirements-deploy.txt &&
+      python manage.py collectstatic --no-input &&
+      python manage.py migrate --no-input
+    # 1 processo com 4 threads: o índice de sugestões (cerca de 130 MB) fica
+    # na memória uma vez só; o plano gratuito tem 512 MB
+    startCommand: gunicorn project.wsgi:application --workers 1 --threads 4 --timeout 60 --bind 0.0.0.0:$PORT
+    healthCheckPath: /
+    envVars:
+      - key: DEBUG
+        value: "False"
+      # Chave secreta nova, gerada pelo Render (nunca a do repositório)
+      - key: SECRET_KEY
+        generateValue: true
+      # Endereço do banco no Neon: o Render pede para colar na criação
+      - key: DATABASE_URL
+        sync: false

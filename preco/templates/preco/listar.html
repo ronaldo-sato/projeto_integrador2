@@ -1,51 +1,173 @@
-{% include "base/partials/head.html" %}
+{% extends "base/layout.html" %}
+{% load static %}
 
-  <body id="body" class="main-bg main-content">
+{% block titulo %}Preços{% endblock %}
 
-    {% include "base/partials/message.html" %}
+{% block conteudo %}
+<div class="container">
+  <header class="cabecalho-pagina d-flex align-items-center gap-3 mb-4">
+    <span class="icone-titulo" aria-hidden="true"><i class="bi bi-tag"></i></span>
+    <div>
+      <h1 class="mb-0">Preços</h1>
+      <p class="text-body-secondary mb-0">Registre o preço de um medicamento veterinário encontrado em um estabelecimento.</p>
+    </div>
+  </header>
 
-    <section id="lista-preco" class="main-content section-page">
-      <div>
-        <h3>Preços Cadastrados</h3>
-      </div>
-      <div>
-        <table class="tabela">
+  <!-- Cadastro -->
+  <div class="card mb-4">
+    <div class="card-header py-3"><i class="bi bi-plus-circle me-2 text-primary" aria-hidden="true"></i>Registrar preço</div>
+    <div class="card-body">
+      {% if not medicamentos_unicos or not farmacias %}
+        <!-- Sem medicamento ou estabelecimento cadastrados não há como registrar preço -->
+        <div class="alert alert-info mb-0">
+          Para registrar um preço é preciso ter pelo menos
+          {% if not medicamentos_unicos %}um <a href="{% url 'medicamento:listar' %}">medicamento</a>{% endif %}
+          {% if not medicamentos_unicos and not farmacias %} e {% endif %}
+          {% if not farmacias %}um <a href="{% url 'farmacia:listar' %}">estabelecimento</a>{% endif %}
+          cadastrado.
+        </div>
+      {% else %}
+      <!-- data-foco: campo que recebe o cursor após um erro (ver preco.js) -->
+      <form id="formulario-preco" action="{% url 'preco:cadastrar' %}" method="POST" data-foco="{{ foco|default:'' }}">
+        {% csrf_token %}
+        <div class="row g-3">
+          <div class="col-md-6 col-xl-3">
+            <label for="select-medicamento" class="form-label">Medicamento</label>
+            <select id="select-medicamento" name="medicamento_nome" class="form-select" required>
+              <option value="">Selecione</option>
+              {% for medicamento in medicamentos_unicos %}
+                <!-- Para manter o estado: medicamento_selecionado -->
+                <option value="{{ medicamento.nome }}" {% if medicamento.nome == medicamento_selecionado %}selected{% endif %}>{{ medicamento.nome }}</option>
+              {% endfor %}
+            </select>
+            <!-- Sem JavaScript, as marcas são carregadas pelo servidor -->
+            <noscript>
+              <button type="submit" class="btn btn-sm btn-outline-secondary mt-2" name="acao_botao" value="filtrar" formnovalidate>
+                Carregar marcas
+              </button>
+            </noscript>
+          </div>
+
+          <div class="col-md-6 col-xl-3">
+            <label for="select-fabricante" class="form-label">Fabricante (marca)</label>
+            <!-- As opções mudam conforme o medicamento escolhido (preco.js) -->
+            <select id="select-fabricante" name="medicamento_id" class="form-select" required
+                    data-selecionado="{{ fabricante_selecionado_id|default:'' }}">
+              {% if fabricantes_filtrados %}
+                <option value="">Selecione o fabricante</option>
+                {% for medicamento in fabricantes_filtrados %}
+                  <!-- Para manter o estado: fabricante_selecionado_id -->
+                  <option value="{{ medicamento.id }}" {% if medicamento.id|stringformat:"s" == fabricante_selecionado_id %}selected{% endif %}>{{ medicamento.fabricante }}</option>
+                {% endfor %}
+              {% else %}
+                <option value="">Escolha o medicamento</option>
+              {% endif %}
+            </select>
+          </div>
+
+          <div class="col-md-6 col-xl-3">
+            <label for="select-farmacia" class="form-label">Estabelecimento</label>
+            <select id="select-farmacia" name="farmacia_id" class="form-select" required>
+              <option value="">Selecione</option>
+              {% for farmacia in farmacias %}
+                <option value="{{ farmacia.id }}" {% if farmacia.id|stringformat:"s" == farmacia_selecionada_id %}selected{% endif %}>{{ farmacia.nome_com_local }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="col-md-6 col-xl-3">
+            <label for="valor-preco" class="form-label">Preço</label>
+            <div class="input-group">
+              <span class="input-group-text">R$</span>
+              <!-- A validação definitiva do valor é feita no servidor -->
+              <input type="text" id="valor-preco" name="valor_preco" class="form-control" required
+                     inputmode="decimal" placeholder="0,00" aria-describedby="ajuda-preco"
+                     value="{{ preco_digitado|default:'' }}">
+            </div>
+            <div id="ajuda-preco" class="form-text">Use vírgula para os centavos. Medicamento gratuito: 0.</div>
+          </div>
+        </div>
+
+        <div class="d-flex justify-content-end mt-3">
+          <button type="submit" class="btn btn-primary"><i class="bi bi-check2 me-1" aria-hidden="true"></i>Registrar preço</button>
+        </div>
+      </form>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Lista -->
+  <div class="card">
+    <div class="card-header py-3 d-flex flex-wrap gap-2 justify-content-between align-items-center">
+      <span>Preços registrados <span class="badge rounded-pill text-bg-light ms-1">{{ precos|length }}</span></span>
+      {% if precos %}
+        <input type="search" class="form-control form-control-sm w-auto" placeholder="Filtrar..."
+               aria-label="Filtrar preços" data-filtrar-tabela="#tabela-precos" data-sem-resultado="#precos-sem-resultado">
+      {% endif %}
+    </div>
+    {% if precos %}
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0" id="tabela-precos">
+          <caption class="visually-hidden">Preços registrados, do mais recente para o mais antigo</caption>
           <thead>
             <tr>
-              <th>Medicamento</th>
-              <th>Fabricante</th>
-              <th>Farmácia</th>
-              <th>Endereço</th>
-              <th>Preço</th>
-              <th>Data e Hora</th>
-              <th>Ações</th>
+              <th scope="col">Medicamento</th>
+              <th scope="col">Estabelecimento</th>
+              <th scope="col" class="text-end">Preço</th>
+              <th scope="col" class="d-none d-md-table-cell">Registrado em</th>
+              <th scope="col" class="text-end">Ações</th>
             </tr>
           </thead>
-
           <tbody>
             {% for preco in precos %}
             <tr>
-              <td>{{ preco.medicamento.nome }}</td>
-              <td>{{ preco.medicamento.fabricante }}</td>
-              <td>{{ preco.farmacia.nome }}</td>
-              <td>{{ preco.farmacia.endereco }}</td>
-              <td>R$ {{ preco.preco }}</td>
-              <td>{{ preco.data_hora|date:"d/m/Y H:i" }}</td>
               <td>
-                <a href="{% url 'preco:atualizar' preco.id %}" class="btn-editar" onclick="return confirm('ATENÇÃO: Deseja realmente EDITAR o preco &quot;{{ preco.nome }}&quot;?')">Editar</a>
-                <a href="{% url 'preco:deletar' preco.id %}" class="btn-excluir" onclick="return confirm('ATENÇÃO: Deseja realmente EXCLUIR o preco &quot;{{ preco.nome }}?&quot;')">Excluir</a>
+                <div class="d-flex align-items-center gap-3">
+                  {% include "medicamento/partials/ilustracao.html" with forma=preco.medicamento.forma tamanho="pequena" %}
+                  <div>
+                    <div class="fw-semibold">{{ preco.medicamento.nome }}</div>
+                    <div class="small text-body-secondary">{{ preco.medicamento.fabricante }}</div>
+                  </div>
+                </div>
               </td>
-            </tr>
-            {% empty %}
-            <tr>
-              <td colspan="7" class="td-colspan">Nenhum preco cadastrado até o momento.</td>
+              <td>
+                <div>{{ preco.farmacia.nome }} <span class="badge rounded-pill badge-tipo badge-tipo-{{ preco.farmacia.tipo }} ms-1">{% include "farmacia/partials/icone_tipo.html" with tipo=preco.farmacia.tipo %} {{ preco.farmacia.get_tipo_display }}</span></div>
+                <div class="small text-body-secondary">{{ preco.farmacia.endereco }}</div>
+              </td>
+              <td class="text-end valor">R$ {{ preco.preco }}</td>
+              <td class="text-body-secondary small text-nowrap d-none d-md-table-cell">{{ preco.data_hora|date:"d/m/Y H:i" }}</td>
+              <td class="text-end text-nowrap">
+                <a href="{% url 'preco:atualizar' preco.id %}" class="btn btn-sm btn-outline-secondary">
+                  <i class="bi bi-pencil" aria-hidden="true"></i> Editar
+                </a>
+                <!-- Exclusão só por POST, com confirmação (data-confirmar) -->
+                <form action="{% url 'preco:deletar' preco.id %}" method="POST" class="d-inline"
+                      data-confirmar="Excluir o preço de R$ {{ preco.preco }} de &quot;{{ preco.medicamento.nome }}&quot; em {{ preco.farmacia.nome }}?">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-sm btn-outline-danger">
+                    <i class="bi bi-trash3" aria-hidden="true"></i> Excluir
+                  </button>
+                </form>
+              </td>
             </tr>
             {% endfor %}
           </tbody>
         </table>
-        <span class="span">{{ precos|length }} registros</span>
-        <a href="{% url 'base:index' %}" class="link-voltar">Voltar para a Home</a>
       </div>
-    </section>
-  </body>
-</html>
+      <p id="precos-sem-resultado" class="text-center text-body-secondary py-4 mb-0" hidden>Nenhum preço encontrado.</p>
+    {% else %}
+      <div class="card-body text-center py-5 estado-vazio">
+        <i class="bi bi-tag d-block mb-2" aria-hidden="true"></i>
+        Nenhum preço registrado ainda.
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Lista de fabricantes para o JavaScript (json_script escapa o conteúdo) -->
+{{ fabricantes_json|json_script:"dados-fabricantes" }}
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'global/js/preco.js' %}"></script>
+{% endblock %}

@@ -1,0 +1,9 @@
+# Dependências para o servidor (Render). Formato do pip, diferente do
+# requirements.txt (que é do conda, para o ambiente de desenvolvimento)
+Django>=6.0.8,<6.1
+psycopg[binary]>=3.3,<3.4
+python-dotenv>=1.2,<2
+# Servidor web de produção (o runserver é só para desenvolvimento)
+gunicorn>=26.2,<27
+# Serve os arquivos estáticos (CSS, JS, Bootstrap) com DEBUG desligado
+whitenoise>=6.12,<7

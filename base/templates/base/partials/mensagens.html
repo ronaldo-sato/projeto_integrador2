@@ -1,0 +1,23 @@
+<!-- Mensagens de retorno (toasts): ficam no canto da tela, visíveis em
+     qualquer ponto da página, e somem sozinhas (ver app.js) -->
+{% if messages %}
+  <div class="toast-container position-fixed top-0 end-0 p-3 mensagens" role="status" aria-live="polite">
+    {% for message in messages %}
+      {% with tipo=message.tags|default:'info' %}
+      <div class="toast show align-items-center border-0 toast-{% if tipo == 'error' %}danger{% else %}{{ tipo }}{% endif %}"
+           role="alert" aria-atomic="true" data-tipo="{{ tipo }}">
+        <div class="d-flex">
+          <div class="toast-body d-flex gap-2 align-items-start">
+            {% if tipo == 'success' %}<i class="bi bi-check-circle-fill" aria-hidden="true"></i>
+            {% elif tipo == 'warning' %}<i class="bi bi-exclamation-triangle-fill" aria-hidden="true"></i>
+            {% elif tipo == 'error' %}<i class="bi bi-x-circle-fill" aria-hidden="true"></i>
+            {% else %}<i class="bi bi-info-circle-fill" aria-hidden="true"></i>{% endif %}
+            <span>{{ message }}</span>
+          </div>
+          <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Fechar mensagem"></button>
+        </div>
+      </div>
+      {% endwith %}
+    {% endfor %}
+  </div>
+{% endif %}

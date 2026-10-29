@@ -1,0 +1,56 @@
+{% with secao=request.resolver_match.app_name %}
+<nav class="navbar navbar-expand-lg bg-white border-bottom sticky-top" aria-label="Menu principal">
+  <div class="container">
+    <a class="navbar-brand fw-semibold d-flex align-items-center gap-2" href="{% url 'base:index' %}">
+      <span class="marca-icone" aria-hidden="true">{% include "base/partials/icone_pata.html" %}</span>
+      Comparador Vet
+    </a>
+
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menu-principal"
+            aria-controls="menu-principal" aria-expanded="false" aria-label="Abrir menu">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="menu-principal">
+      {% if user.is_authenticated %}
+        <ul class="navbar-nav me-auto ms-lg-4">
+          <li class="nav-item">
+            <a class="nav-link {% if secao == 'pesquisa' %}active{% endif %}" {% if secao == 'pesquisa' %}aria-current="page"{% endif %}
+               href="{% url 'pesquisa:precos' %}"><i class="bi bi-search me-1" aria-hidden="true"></i>Pesquisar</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link {% if secao == 'preco' %}active{% endif %}" {% if secao == 'preco' %}aria-current="page"{% endif %}
+               href="{% url 'preco:listar' %}"><i class="bi bi-tag me-1" aria-hidden="true"></i>Preços</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link {% if secao == 'medicamento' %}active{% endif %}" {% if secao == 'medicamento' %}aria-current="page"{% endif %}
+               href="{% url 'medicamento:listar' %}"><i class="bi bi-capsule me-1" aria-hidden="true"></i>Medicamentos</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link {% if secao == 'farmacia' %}active{% endif %}" {% if secao == 'farmacia' %}aria-current="page"{% endif %}
+               href="{% url 'farmacia:listar' %}"><i class="bi bi-shop me-1" aria-hidden="true"></i>Estabelecimentos</a>
+          </li>
+        </ul>
+
+        <div class="d-flex align-items-center gap-3 mt-2 mt-lg-0">
+          <span class="text-body-secondary small">
+            <i class="bi bi-person-circle me-1" aria-hidden="true"></i>{{ user.username }}
+          </span>
+          <!-- Logout só por POST (proteção CSRF) -->
+          <form action="{% url 'base:logout' %}" method="POST" class="m-0">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-outline-secondary btn-sm btn-sair">
+              <i class="bi bi-box-arrow-right me-1" aria-hidden="true"></i>Sair
+            </button>
+          </form>
+        </div>
+      {% else %}
+        <div class="ms-auto d-flex gap-2 mt-2 mt-lg-0">
+          <button type="button" class="btn btn-outline-primary btn-sm" data-abrir-autenticacao="login">Entrar</button>
+          <button type="button" class="btn btn-primary btn-sm" data-abrir-autenticacao="register">Criar conta</button>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</nav>
+{% endwith %}

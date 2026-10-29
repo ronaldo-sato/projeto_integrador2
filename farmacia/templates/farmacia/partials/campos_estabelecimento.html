@@ -1,0 +1,111 @@
+<!-- Campos do estabelecimento (usados no cadastro e na edição).
+     value: após um erro, mantém o que o usuário digitou -->
+
+<fieldset class="mb-3">
+  <legend class="form-label fs-6 mb-2">Tipo</legend>
+  <div class="row row-cols-2 g-2 opcoes-tipo">
+    {% for valor, rotulo in tipos %}
+      <div class="col">
+        <input type="radio" class="btn-check" name="tipo" id="tipo-{{ valor }}" value="{{ valor }}" autocomplete="off"
+               {% if dados.tipo == valor %}checked{% endif %} required>
+        <label class="btn btn-outline-primary w-100 text-start" for="tipo-{{ valor }}">
+          {% include "farmacia/partials/icone_tipo.html" with tipo=valor %} {{ rotulo }}
+        </label>
+      </div>
+    {% endfor %}
+  </div>
+</fieldset>
+
+<!-- Nome com sugestões de estabelecimentos registrados no MAPA (farmacia.js).
+     Escolher uma sugestão preenche o CNPJ e, a partir dele, o endereço -->
+<div class="mb-3 position-relative">
+  <label for="nome-farmacia" class="form-label">Nome</label>
+  <input type="text" id="nome-farmacia" name="nome_farmacia" class="form-control" required
+         maxlength="{{ tamanhos.nome }}" placeholder="Ex.: Pet Shop Amigo Fiel" aria-describedby="ajuda-nome"
+         value="{{ dados.nome|default:'' }}"
+         {% if dados_mapa_disponiveis %}autocomplete="off" role="combobox" aria-autocomplete="list"
+         aria-expanded="false" aria-controls="lista-estabelecimentos"
+         data-url-sugestoes="{% url 'farmacia:sugestoes' %}"{% endif %}>
+  {% if dados_mapa_disponiveis %}
+    <ul id="lista-estabelecimentos" class="list-group sugestoes shadow" role="listbox"
+        aria-label="Estabelecimentos registrados no MAPA" hidden></ul>
+  {% endif %}
+  <div id="ajuda-nome" class="form-text">
+    {% if dados_mapa_disponiveis %}Digite o nome (e a cidade, se quiser) para buscar entre os estabelecimentos registrados no MAPA. {% endif %}Redes com várias unidades podem repetir o nome, com endereços diferentes.
+  </div>
+</div>
+
+<!-- CNPJ (opcional): preenche os dados pela Receita Federal e mostra se o
+     estabelecimento é registrado no MAPA (farmacia.js chama buscar_cnpj) -->
+<div class="mb-3">
+  <label for="cnpj" class="form-label">CNPJ <span class="text-body-secondary fw-normal">(opcional, preenche os dados)</span></label>
+  <div class="input-group">
+    <input type="text" id="cnpj" name="cnpj" class="form-control" inputmode="numeric"
+           maxlength="18" placeholder="00.000.000/0000-00" aria-describedby="status-cnpj"
+           value="{{ cnpj_exibido|default:'' }}"
+           data-url-cnpj="{% url 'farmacia:buscar_cnpj' '00000000000000' %}"
+           data-ignorar="{{ farmacia.id|default:'' }}">
+    <button type="button" class="btn btn-outline-secondary" id="btn-buscar-cnpj" title="Buscar dados pelo CNPJ">
+      <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" hidden></span>
+      <i class="bi bi-search" aria-hidden="true"></i><span class="visually-hidden">Buscar dados pelo CNPJ</span>
+    </button>
+  </div>
+  <div id="status-cnpj" class="form-text" aria-live="polite">Com o CNPJ, buscamos o endereço na Receita Federal e o registro no MAPA.</div>
+</div>
+
+<!-- Busca do endereço pelo CEP (farmacia.js chama o endpoint buscar_cep) -->
+<div class="mb-3">
+  <label for="cep" class="form-label">CEP <span class="text-body-secondary fw-normal">(preenche o endereço)</span></label>
+  <div class="input-group">
+    <input type="text" id="cep" name="cep" class="form-control" inputmode="numeric" autocomplete="postal-code"
+           maxlength="9" placeholder="00000-000" aria-describedby="status-cep" value="{{ dados.cep|default:'' }}"
+           data-url-cep="{% url 'farmacia:buscar_cep' '00000000' %}">
+    <button type="button" class="btn btn-outline-secondary" id="btn-buscar-cep" title="Buscar endereço pelo CEP">
+      <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" hidden></span>
+      <i class="bi bi-search" aria-hidden="true"></i><span class="visually-hidden">Buscar endereço pelo CEP</span>
+    </button>
+  </div>
+  <div id="status-cep" class="form-text" aria-live="polite">Não sabe o CEP? Preencha o endereço manualmente.</div>
+</div>
+
+<div class="mb-3">
+  <label for="logradouro" class="form-label">Logradouro</label>
+  <input type="text" id="logradouro" name="logradouro" class="form-control" required autocomplete="address-line1"
+         maxlength="{{ tamanhos.logradouro }}" placeholder="Rua, avenida..." value="{{ dados.logradouro|default:'' }}">
+</div>
+
+<div class="row g-2 mb-3">
+  <div class="col-5">
+    <label for="numero" class="form-label">Número</label>
+    <input type="text" id="numero" name="numero" class="form-control" required
+           maxlength="{{ tamanhos.numero }}" placeholder="Ex.: 120 ou s/n" value="{{ dados.numero|default:'' }}">
+  </div>
+  <div class="col-7">
+    <label for="complemento" class="form-label">Complemento <span class="text-body-secondary fw-normal">(opcional)</span></label>
+    <input type="text" id="complemento" name="complemento" class="form-control" autocomplete="address-line2"
+           maxlength="{{ tamanhos.complemento }}" placeholder="Loja, sala..." value="{{ dados.complemento|default:'' }}">
+  </div>
+</div>
+
+<div class="mb-3">
+  <label for="bairro" class="form-label">Bairro</label>
+  <input type="text" id="bairro" name="bairro" class="form-control" required
+         maxlength="{{ tamanhos.bairro }}" value="{{ dados.bairro|default:'' }}">
+</div>
+
+<div class="row g-2 mb-4">
+  <div class="col-8">
+    <label for="cidade" class="form-label">Cidade</label>
+    <input type="text" id="cidade" name="cidade" class="form-control" required autocomplete="address-level2"
+           maxlength="{{ tamanhos.cidade }}" value="{{ dados.cidade|default:'' }}">
+  </div>
+  <div class="col-4">
+    <label for="uf" class="form-label">UF</label>
+    <select id="uf" name="uf" class="form-select" required autocomplete="address-level1">
+      <option value=""></option>
+      {% for uf in ufs %}
+        <option value="{{ uf }}" {% if dados.uf == uf %}selected{% endif %}>{{ uf }}</option>
+      {% endfor %}
+    </select>
+  </div>
+</div>

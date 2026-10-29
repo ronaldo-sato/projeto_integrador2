@@ -9,4 +9,6 @@ urlpatterns = [
     path('listar/', views.listar, name='listar'),
     path('atualizar/<int:id>', views.atualizar, name='atualizar'),
     path('deletar/<int:id>', views.deletar, name='deletar'),
+    # Sugestões de nomes (busca aproximada; usada pelo formulário via JavaScript)
+    path('sugestoes/', views.sugerir, name='sugestoes'),
 ]

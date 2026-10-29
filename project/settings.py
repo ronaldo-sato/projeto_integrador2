@@ -10,22 +10,46 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
+import os
 from pathlib import Path
+from urllib.parse import parse_qsl, unquote, urlsplit
+
+from django.core.exceptions import ImproperlyConfigured
+from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Carrega as variáveis do arquivo .env (credenciais do banco, fora do git)
+load_dotenv(BASE_DIR / '.env')
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-yd*sq9&b2c12p65h)z*^#rh2(kmzc5rehc%8yvlx!u_7v8&nc^'
-
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# Vem do .env; sem a variável, o padrão é o modo seguro (DEBUG desligado)
+DEBUG = os.getenv('DEBUG', 'False').lower() in ('true', '1', 'yes')
 
-ALLOWED_HOSTS = []
+# SECURITY WARNING: keep the secret key used in production secret!
+# A chave original está pública no histórico do git, então só serve para
+# desenvolvimento. Com DEBUG desligado, SECRET_KEY no .env é obrigatória
+SECRET_KEY = os.getenv('SECRET_KEY')
+if not SECRET_KEY:
+    if not DEBUG:
+        raise ImproperlyConfigured(
+            'Defina SECRET_KEY no .env (obrigatória com DEBUG desligado).')
+    SECRET_KEY = 'django-insecure-yd*sq9&b2c12p65h)z*^#rh2(kmzc5rehc%8yvlx!u_7v8&nc^'
+
+# Domínios aceitos, separados por vírgula no .env (ex.: app.com,www.app.com)
+ALLOWED_HOSTS = [
+    host.strip() for host in os.getenv('ALLOWED_HOSTS', '').split(',')
+    if host.strip()
+]
+# No Render, o endereço do site (ex.: comparador-vet.onrender.com) vem nesta
+# variável, preenchida automaticamente pela plataforma
+if os.getenv('RENDER_EXTERNAL_HOSTNAME'):
+    ALLOWED_HOSTS.append(os.getenv('RENDER_EXTERNAL_HOSTNAME'))
 
 
 # Application definition
@@ -80,12 +104,50 @@ WSGI_APPLICATION = 'project.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+def banco_da_url(url):
+    """Converte o endereço de conexão no formato
+    postgresql://usuario:senha@servidor:porta/banco?sslmode=require
+    (usado pelo Neon e outros serviços na nuvem) para o formato do Django"""
+    partes = urlsplit(url.strip())
+    # Sem esta conferência, um endereço colado errado (ex.: com 'psql' na
+    # frente) faria o Django tentar o banco local, com um erro confuso
+    if partes.scheme not in ('postgres', 'postgresql') or not partes.hostname:
+        raise ImproperlyConfigured(
+            'DATABASE_URL inválido: use só o endereço que começa com '
+            'postgresql:// (sem "psql" e sem aspas simples).')
+    return {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': unquote(partes.path.lstrip('/')),
+        'USER': unquote(partes.username or ''),
+        'PASSWORD': unquote(partes.password or ''),
+        'HOST': partes.hostname or '',
+        'PORT': str(partes.port or 5432),
+        # Parâmetros depois do '?', como sslmode=require (conexão criptografada)
+        'OPTIONS': dict(parse_qsl(partes.query)),
+        # Reaproveita a conexão por até 60 s (o banco fica em outro servidor,
+        # abrir uma conexão nova a cada página deixaria o site mais lento).
+        # Antes de reaproveitar, confere se ela ainda funciona (o Neon
+        # desliga o banco após alguns minutos sem uso)
+        'CONN_MAX_AGE': 60,
+        'CONN_HEALTH_CHECKS': True,
     }
-}
+
+
+# PostgreSQL. Em produção, o endereço completo vem em DATABASE_URL; no
+# computador de cada um, os dados vêm do .env (modelo em .env.example)
+if os.getenv('DATABASE_URL'):
+    DATABASES = {'default': banco_da_url(os.getenv('DATABASE_URL'))}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': os.getenv('DB_NAME', 'projeto_integrador2'),
+            'USER': os.getenv('DB_USER', 'projeto_integrador'),
+            'PASSWORD': os.getenv('DB_PASSWORD'),
+            'HOST': os.getenv('DB_HOST', 'localhost'),
+            'PORT': os.getenv('DB_PORT', '5432'),
+        }
+    }
 
 
 # Password validation
@@ -126,3 +188,37 @@ STATIC_URL = 'static/'
 STATICFILES_DIRS = [
     BASE_DIR / 'base_static',  # css
 ]
+
+# Pasta onde o collectstatic junta os arquivos para a produção
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+# Em produção (DEBUG desligado) o Django não serve CSS/JS: quem serve é o
+# WhiteNoise, que também compacta os arquivos e coloca um código no nome
+# (ex.: app.3f2a1c.css) para o navegador guardar em cache com segurança.
+# Só é necessário no servidor (requirements-deploy.txt)
+if not DEBUG:
+    MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')
+    STORAGES = {
+        'default': {
+            'BACKEND': 'django.core.files.storage.FileSystemStorage',
+        },
+        'staticfiles': {
+            'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage',
+        },
+    }
+
+# Autenticação
+# O login é feito pelo modal da página inicial; views com @login_required
+# redirecionam para lá quando o usuário não está logado
+LOGIN_URL = 'base:index'
+
+# Segurança em produção
+# Com DEBUG desligado, os cookies de sessão e de CSRF só trafegam via HTTPS
+SESSION_COOKIE_SECURE = not DEBUG
+CSRF_COOKIE_SECURE = not DEBUG
+
+# No Render, o HTTPS termina no servidor da plataforma, que repassa a
+# requisição ao Django avisando no cabeçalho X-Forwarded-Proto se ela veio
+# por HTTPS. Sem isto, o Django acharia que todo acesso é HTTP
+if not DEBUG:
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')

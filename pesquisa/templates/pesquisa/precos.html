@@ -1,57 +1,121 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="pt-BR">
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pesquisa de Preços</title>
-    <link href="https://googleapis.com" rel="stylesheet">
-    <link rel="stylesheet" href="{% static 'global/css/global.css' %}">
-    <link rel="stylesheet" href="{% static 'global/css/tables.css' %}">
-  </head>
+{% extends "base/layout.html" %}
 
-  <body id="body" class="main-bg">
+{% block titulo %}{% if pesquisou %}{{ medicamento_nome }} - {% endif %}Pesquisar preços{% endblock %}
 
-    <section class="main-content section-page">
-      <div>
-        {% if precos %}
-          <h2>Preços encontrados para: "{{ medicamento_nome }}"</h2>
-        {% else %}
-          <h2>Nenhum preço cadastrado para "{{ medicamento_nome }}"</h2>
-        {% endif %}
-        <table class="tabela">
-          <thead>
-            <tr>
-              <th>Fabricante</th>
-              <th>Farmácia</th>
-              <th>Endereço</th>
-              <th>Preço</th>
-              <th>Data e Hora</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for preco in precos %}
-              <tr class="{% if preco.preco|floatformat:2 == menor_preco|floatformat:2 %}preco-destaque{% endif %}">
-                <td>{{ preco.medicamento.fabricante }}</td>
-                <td>{{ preco.farmacia.nome }}</td>
-                <td>{{ preco.farmacia.endereco }}</td>
-                <!-- Destacar apenas o menor preço (usa a classe de destaque) -->
-                {% comment %} <td class="{% if preco.preco == menor_preco %}preco-destaque{% endif %}"> {% endcomment %}
-                <td>R$ {{ preco.preco }}</td>
-                <td>{{ preco.data_hora|date:"d/m/Y H:i" }}</td>
-              </tr>
-            {% empty %}
-              <tr>
-                <td colspan="5">Nenhum resultado encontrado.</td>
-              </tr>
+{% block conteudo %}
+<div class="container">
+  <header class="cabecalho-pagina d-flex align-items-center gap-3 mb-4">
+    <span class="icone-titulo" aria-hidden="true"><i class="bi bi-search"></i></span>
+    <div>
+      <h1 class="mb-0">Pesquisar preços</h1>
+      <p class="text-body-secondary mb-0">Veja todas as opções de um medicamento, com o menor preço em destaque.</p>
+    </div>
+  </header>
+
+  <!-- Formulário de pesquisa (GET: o resultado pode ser salvo ou compartilhado) -->
+  <div class="card mb-4">
+    <div class="card-body p-4">
+      <form id="formulario-pesquisa" action="{% url 'pesquisa:precos' %}" method="GET" class="row g-2 align-items-end">
+        <div class="col-md">
+          <label for="select-medicamento-pesquisa" class="form-label">Medicamento</label>
+          <select id="select-medicamento-pesquisa" name="medicamento_nome" class="form-select form-select-lg" required>
+            <option value="">Selecione um medicamento</option>
+            {% for medicamento in medicamentos_unicos %}
+              <option value="{{ medicamento.nome }}" {% if medicamento.nome == medicamento_nome %}selected{% endif %}>{{ medicamento.nome }}</option>
             {% endfor %}
-          </tbody>
-        </table>
-        <p>
-          <a href="{% url 'base:index' %}#pesquisa" class="link-voltar">Voltar para Pesquisa</a>
-        </p>
-      </div>
-    </section>
+          </select>
+        </div>
+        <div class="col-md-auto">
+          <button type="submit" class="btn btn-primary btn-lg w-100"><i class="bi bi-search me-1" aria-hidden="true"></i>Pesquisar</button>
+        </div>
+      </form>
+    </div>
+  </div>
 
-  </body>
-</html>
+  {% if pesquisou %}
+    {% if precos %}
+      <!-- Resumo: menor preço e economia possível -->
+      <div class="row g-3 mb-4">
+        <div class="col-md-8">
+          <div class="card card-menor-preco h-100">
+            <div class="card-body p-4 d-flex gap-4">
+              <!-- Desenho ilustrativo da forma do medicamento (não é foto do produto) -->
+              <div class="text-center d-none d-sm-block">
+                {% include "medicamento/partials/ilustracao.html" with forma=forma tamanho="grande" %}
+                <div class="small text-body-secondary mt-2">{{ forma.rotulo }}</div>
+              </div>
+              <div>
+                <p class="text-uppercase small fw-semibold mb-2" style="color: var(--cor-destaque)">
+                  <i class="bi bi-trophy-fill me-1" aria-hidden="true"></i>Menor preço
+                </p>
+                <div class="numero-grande mb-2">R$ {{ menor_preco }}</div>
+                {% for opcao in opcoes_menor_preco %}
+                  <p class="mb-0">
+                    <strong>{{ opcao.medicamento.fabricante }}</strong> em <strong>{{ opcao.farmacia.nome }}</strong> <span class="badge rounded-pill badge-tipo badge-tipo-{{ opcao.farmacia.tipo }} ms-1">{% include "farmacia/partials/icone_tipo.html" with tipo=opcao.farmacia.tipo %} {{ opcao.farmacia.get_tipo_display }}</span> {% include "farmacia/partials/selo_mapa.html" with registrado=opcao.registrado_mapa %}
+                    <span class="text-body-secondary">· {{ opcao.farmacia.endereco }}</span>
+                  </p>
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card h-100">
+            <div class="card-body p-4">
+              <p class="text-uppercase small fw-semibold text-body-secondary mb-2">Economia possível</p>
+              <div class="numero-grande mb-2">R$ {{ economia }}</div>
+              <p class="text-body-secondary small mb-0">Diferença entre a opção mais cara e a mais barata.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header py-3">
+          {{ precos|length }} opç{{ precos|length|pluralize:"ão,ões" }} para "{{ medicamento_nome }}"
+        </div>
+        <div class="table-responsive">
+          <table class="table align-middle mb-0">
+            <caption class="visually-hidden">Preços de {{ medicamento_nome }}, do menor para o maior</caption>
+            <thead>
+              <tr>
+                <th scope="col">Fabricante</th>
+                <th scope="col">Estabelecimento</th>
+                <th scope="col" class="text-end">Preço</th>
+                <th scope="col" class="d-none d-md-table-cell">Atualizado em</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for preco in precos %}
+                <!-- Destaca o menor preço (inclusive empates) -->
+                <tr class="{% if preco.preco == menor_preco %}linha-menor-preco{% endif %}">
+                  <td class="fw-semibold">
+                    {{ preco.medicamento.fabricante }}
+                    {% if preco.preco == menor_preco %}
+                      <span class="badge text-bg-success ms-1">Menor preço</span>
+                    {% endif %}
+                  </td>
+                  <td>
+                    <div>{{ preco.farmacia.nome }} <span class="badge rounded-pill badge-tipo badge-tipo-{{ preco.farmacia.tipo }} ms-1">{% include "farmacia/partials/icone_tipo.html" with tipo=preco.farmacia.tipo %} {{ preco.farmacia.get_tipo_display }}</span> {% include "farmacia/partials/selo_mapa.html" with registrado=preco.registrado_mapa %}</div>
+                    <div class="small text-body-secondary">{{ preco.farmacia.endereco }}</div>
+                  </td>
+                  <td class="text-end valor">R$ {{ preco.preco }}</td>
+                  <td class="text-body-secondary small text-nowrap d-none d-md-table-cell">{{ preco.data_hora|date:"d/m/Y H:i" }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    {% else %}
+      <div class="card">
+        <div class="card-body text-center py-5 estado-vazio">
+          <i class="bi bi-emoji-neutral d-block mb-2" aria-hidden="true"></i>
+          <p class="mb-3">Nenhum preço registrado para "{{ medicamento_nome }}" ainda.</p>
+          <a href="{% url 'preco:listar' %}" class="btn btn-outline-primary btn-sm">Registrar o primeiro preço</a>
+        </div>
+      </div>
+    {% endif %}
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,20 +1,46 @@
-{% extends 'base/partials/atualizar.html' %}
+{% extends "base/layout.html" %}
+{% load static %}
 
-{% block title %}
-    {{ title }} | {{ farmacia.nome }}
-{% endblock title %}
+{% block titulo %}Editar estabelecimento{% endblock %}
 
-{% block h3 %}
-    Editar Farmácias
-{% endblock h3 %}
+{% block conteudo %}
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-md-9 col-lg-7 col-xl-6">
+      <nav aria-label="Navegação estrutural" class="mb-3">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="{% url 'farmacia:listar' %}">Estabelecimentos</a></li>
+          <li class="breadcrumb-item active" aria-current="page">Editar</li>
+        </ol>
+      </nav>
 
-{% block formulario %}
-  <p>
-    <label for="nome-farmacia">Nome da Farmácia:</label>
-    <input type="text" id="nome-farmacia" name="nome_farmacia" value="{{ farmacia.nome }}" required>
-  </p>
-  <p>
-    <label for="endereco">Endereço:</label>
-    <input type="text" id="endereco" name="endereco" value="{{ farmacia.endereco }}" required>
-  </p>
-{% endblock formulario %}
+      <div class="card">
+        <div class="card-body p-4">
+          <h1 class="h4 fw-bold mb-1">Editar estabelecimento</h1>
+          <p class="text-body-secondary mb-4">{{ farmacia.nome }} · {{ farmacia.endereco }}</p>
+
+          {% if not farmacia.numero %}
+            <!-- Cadastros anteriores à busca por CEP só tinham o endereço em texto -->
+            <div class="alert alert-info small">
+              Este cadastro é anterior à busca por CEP. Informe o CEP (ou preencha os campos) para completar o endereço.
+            </div>
+          {% endif %}
+
+          <form action="{% url 'farmacia:atualizar' farmacia.id %}" method="POST">
+            {% csrf_token %}
+            {% include "farmacia/partials/campos_estabelecimento.html" %}
+            <div class="d-flex gap-2 justify-content-end">
+              <a href="{% url 'farmacia:listar' %}" class="btn btn-light">Cancelar</a>
+              <button type="submit" class="btn btn-primary">Salvar alterações</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'global/js/farmacia.js' %}"></script>
+{% endblock %}

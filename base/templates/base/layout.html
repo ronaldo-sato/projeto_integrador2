@@ -1,0 +1,48 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block titulo %}Início{% endblock %} | Comparador Vet</title>
+    <meta name="description" content="Compare preços de medicamentos veterinários em farmácias, pet shops, agropecuárias e clínicas da sua região.">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%230d9488'%3E%3Cellipse cx='5.5' cy='10.2' rx='2.1' ry='2.7'/%3E%3Cellipse cx='9.6' cy='5.6' rx='2.1' ry='2.8'/%3E%3Cellipse cx='14.4' cy='5.6' rx='2.1' ry='2.8'/%3E%3Cellipse cx='18.5' cy='10.2' rx='2.1' ry='2.7'/%3E%3Cpath d='M12 11.3c-2.9 0-6.2 3.7-6.2 6.5 0 1.7 1.3 2.6 2.8 2.6 1.4 0 2.2-.8 3.4-.8s2 .8 3.4.8c1.5 0 2.8-.9 2.8-2.6 0-2.8-3.3-6.5-6.2-6.5z'/%3E%3C/svg%3E">
+    <!-- Bootstrap e Bootstrap Icons ficam dentro do projeto (base_static/vendor):
+         funcionam offline e sem depender de sites de terceiros -->
+    <link rel="stylesheet" href="{% static 'vendor/bootstrap/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'vendor/bootstrap-icons/bootstrap-icons.min.css' %}">
+    <link rel="stylesheet" href="{% static 'global/css/app.css' %}">
+  </head>
+
+  <body class="d-flex flex-column min-vh-100">
+    <!-- Acessibilidade: atalho de teclado para pular o menu -->
+    <a class="visually-hidden-focusable btn btn-primary position-absolute m-2" href="#conteudo">Pular para o conteúdo</a>
+
+    {% if user.is_authenticated %}
+      <!-- Desenhos das formas dos medicamentos (usados nas listas e na pesquisa) -->
+      {% include "medicamento/partials/sprite_formas.html" %}
+    {% endif %}
+    {% include "base/partials/navbar.html" %}
+    {% include "base/partials/mensagens.html" %}
+
+    <main id="conteudo" class="flex-grow-1 {% block classe_main %}py-4 py-lg-5{% endblock %}">
+      {% block conteudo %}{% endblock %}
+    </main>
+
+    <footer class="rodape py-4 mt-auto">
+      <div class="container d-flex flex-column flex-md-row justify-content-between gap-2 small">
+        <span>{% include "base/partials/icone_pata.html" %} Comparador de Preços de Medicamentos Veterinários</span>
+        <span>Projeto Integrador 2 · Univesp · Grupo 10 · <a href="{% url 'base:index' %}#sobre">Sobre o projeto</a></span>
+      </div>
+    </footer>
+
+    {% if not user.is_authenticated %}
+      {% include "base/partials/modal_autenticacao.html" %}
+    {% endif %}
+    {% include "base/partials/modal_confirmar.html" %}
+
+    <script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'global/js/app.js' %}"></script>
+    {% block scripts %}{% endblock %}
+  </body>
+</html>

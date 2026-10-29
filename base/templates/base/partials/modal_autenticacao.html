@@ -1,0 +1,93 @@
+<!-- Janela de login e cadastro (só para visitantes) -->
+<!-- data-aba-aberta: após um erro de login/cadastro, a janela reabre na aba
+     certa com os dados preenchidos (ver app.js) -->
+<div class="modal fade" id="auth-modal" tabindex="-1" aria-labelledby="auth-modal-titulo" aria-hidden="true"
+     data-aba-aberta="{% if aba_modal %}{{ aba_modal }}{% elif request.GET.next %}login{% endif %}"
+     data-url-home="{% url 'base:index' %}">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow">
+      <div class="modal-header border-0 pb-0">
+        <h2 class="modal-title fs-5" id="auth-modal-titulo">Acesse sua conta</h2>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+      </div>
+
+      <div class="modal-body pt-2">
+        <ul class="nav nav-pills nav-fill mb-4 abas-autenticacao" role="tablist">
+          <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="tab-login" data-bs-toggle="pill" data-bs-target="#painel-login"
+                    type="button" role="tab" aria-controls="painel-login" aria-selected="true">Entrar</button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="tab-register" data-bs-toggle="pill" data-bs-target="#painel-register"
+                    type="button" role="tab" aria-controls="painel-register" aria-selected="false">Criar conta</button>
+          </li>
+        </ul>
+
+        <div class="tab-content">
+          <!-- Login -->
+          <div class="tab-pane fade show active" id="painel-login" role="tabpanel" aria-labelledby="tab-login" tabindex="0">
+            {% if request.GET.next %}
+              <p class="alert alert-info small py-2">Entre na sua conta para acessar essa página.</p>
+            {% endif %}
+            <form id="form-login" action="{% url 'base:login' %}" method="POST">
+              {% csrf_token %}
+              <!-- Página que o usuário tentou abrir antes de entrar -->
+              <input type="hidden" name="next" value="{% firstof request.GET.next next '' %}">
+              <div class="mb-3">
+                <label for="login-username" class="form-label">Usuário</label>
+                <input type="text" id="login-username" name="username" class="form-control" required
+                       autocomplete="username" value="{{ dados_login.username|default:'' }}">
+              </div>
+              <div class="mb-4">
+                <label for="login-password" class="form-label">Senha</label>
+                <div class="input-group">
+                  <input type="password" id="login-password" name="password" class="form-control" required
+                         autocomplete="current-password">
+                  <!-- Mostrar/ocultar a senha digitada (app.js) -->
+                  <button type="button" class="btn btn-outline-secondary btn-ver-senha" data-alternar-senha="#login-password"
+                          aria-label="Mostrar senha" aria-pressed="false" title="Mostrar senha">
+                    <i class="bi bi-eye" aria-hidden="true"></i>
+                  </button>
+                </div>
+              </div>
+              <button type="submit" class="btn btn-primary w-100">Entrar</button>
+            </form>
+          </div>
+
+          <!-- Cadastro -->
+          <div class="tab-pane fade" id="painel-register" role="tabpanel" aria-labelledby="tab-register" tabindex="0">
+            <form id="form-register" action="{% url 'base:register' %}" method="POST">
+              {% csrf_token %}
+              <div class="mb-3">
+                <label for="reg-username" class="form-label">Nome de usuário</label>
+                <input type="text" id="reg-username" name="username" class="form-control" required maxlength="150"
+                       autocomplete="username" placeholder="Ex.: joaosilva" value="{{ dados_cadastro.username|default:'' }}">
+              </div>
+              <div class="mb-3">
+                <label for="reg-email" class="form-label">E-mail</label>
+                <input type="email" id="reg-email" name="email" class="form-control" required
+                       autocomplete="email" placeholder="seu@email.com" value="{{ dados_cadastro.email|default:'' }}">
+              </div>
+              <div class="mb-4">
+                <label for="reg-password" class="form-label">Senha</label>
+                <div class="input-group">
+                  <input type="password" id="reg-password" name="password" class="form-control" required minlength="8"
+                         autocomplete="new-password" aria-describedby="ajuda-senha">
+                  <!-- Mostrar/ocultar a senha digitada (app.js) -->
+                  <button type="button" class="btn btn-outline-secondary btn-ver-senha" data-alternar-senha="#reg-password"
+                          aria-label="Mostrar senha" aria-pressed="false" title="Mostrar senha">
+                    <i class="bi bi-eye" aria-hidden="true"></i>
+                  </button>
+                </div>
+                <div id="ajuda-senha" class="form-text">
+                  Mínimo de 8 caracteres. Evite senhas comuns, só números ou parecidas com o usuário.
+                </div>
+              </div>
+              <button type="submit" class="btn btn-primary w-100">Criar conta</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

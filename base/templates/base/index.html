@@ -1,50 +1,149 @@
-{% load static %}
+{% extends "base/layout.html" %}
 
-<!DOCTYPE html>
-<html lang="pt-BR">
+{% block titulo %}Início{% endblock %}
+{% block classe_main %}{% endblock %}
 
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    {% comment %} <title>Projeto Integrador 1</title> {% endcomment %}
-    <title>{% block title %}{{ titulo }}{% endblock %}</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-    href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap"
-    rel="stylesheet">
-    <!-- Leitura de arquivo.css com Django (tag static: o caminho é relativo) -->
-    {% comment %} <link rel="stylesheet" href="{% static 'css/global.css' %}"> {% endcomment %}
-    <link rel="stylesheet" href="{% static 'global/css/global.css' %}">
-    <link rel="stylesheet" href="{% static 'global/css/forms.css' %}">
-  </head>
+{% block conteudo %}
+{% if user.is_authenticated %}
 
-  <body id="body" class="main-bg main-content">
+  <!-- Painel do usuário logado -->
+  <section class="container py-4 py-lg-5">
+    <div class="mb-4">
+      <h1 class="h3 fw-bold mb-1">Olá, {{ user.username }}!</h1>
+      <p class="text-body-secondary mb-0">O que você quer fazer hoje?</p>
+    </div>
 
-    {% include "base/partials/message.html" %}
+    <!-- Pesquisa rápida: a principal tarefa da aplicação -->
+    <div class="card mb-4">
+      <div class="card-body p-4">
+        <h2 class="h5 mb-3"><i class="bi bi-search me-2 text-primary" aria-hidden="true"></i>Pesquisar o menor preço</h2>
+        <form action="{% url 'pesquisa:precos' %}" method="GET" class="row g-2 align-items-end">
+          <div class="col-md">
+            <label for="pesquisa-rapida" class="form-label">Medicamento</label>
+            <select id="pesquisa-rapida" name="medicamento_nome" class="form-select form-select-lg" required>
+              <option value="">Selecione um medicamento</option>
+              {% for medicamento in medicamentos_unicos %}
+                <option value="{{ medicamento.nome }}">{{ medicamento.nome }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col-md-auto">
+            <button type="submit" class="btn btn-primary btn-lg w-100">Pesquisar</button>
+          </div>
+        </form>
+      </div>
+    </div>
 
-    <!--Menu de Navegação-->
-    {% include "base/partials/menu.html" %}
+    <!-- Atalhos para as áreas de cadastro -->
+    <div class="row g-3">
+      <div class="col-md-4">
+        <div class="card card-atalho h-100">
+          <div class="card-body p-4">
+            <div class="d-flex justify-content-between align-items-start mb-3">
+              <span class="icone-titulo" aria-hidden="true"><i class="bi bi-tag"></i></span>
+              <span class="numero-grande">{{ total_precos }}</span>
+            </div>
+            <h2 class="h6 mb-1">Preços</h2>
+            <p class="text-body-secondary small mb-3">Registre o preço que você encontrou em uma farmácia ou pet shop.</p>
+            <a href="{% url 'preco:listar' %}" class="stretched-link">Registrar preço</a>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card card-atalho h-100">
+          <div class="card-body p-4">
+            <div class="d-flex justify-content-between align-items-start mb-3">
+              <span class="icone-titulo" aria-hidden="true"><i class="bi bi-capsule"></i></span>
+              <span class="numero-grande">{{ total_medicamentos }}</span>
+            </div>
+            <h2 class="h6 mb-1">Medicamentos</h2>
+            <p class="text-body-secondary small mb-3">Cadastre medicamentos veterinários e seus fabricantes (marcas).</p>
+            <a href="{% url 'medicamento:listar' %}" class="stretched-link">Ver medicamentos</a>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card card-atalho h-100">
+          <div class="card-body p-4">
+            <div class="d-flex justify-content-between align-items-start mb-3">
+              <span class="icone-titulo" aria-hidden="true"><i class="bi bi-shop"></i></span>
+              <span class="numero-grande">{{ total_farmacias }}</span>
+            </div>
+            <h2 class="h6 mb-1">Estabelecimentos</h2>
+            <p class="text-body-secondary small mb-3">Farmácias, pet shops, agropecuárias e clínicas onde os preços foram encontrados.</p>
+            <a href="{% url 'farmacia:listar' %}" class="stretched-link">Ver estabelecimentos</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 
-    <!--Home-->
-    {% include "base/partials/home.html" %}
-    
-    {% if user.is_authenticated %}
-      <!--Cadastro Farmácia-->
-      {% include "base/partials/farmacia.html" %}
+{% else %}
 
-      <!--Cadastro Medicamento-->
-      {% include "base/partials/medicamento.html" %}
-    
-      <!--Cadastro Preço-->
-      {% include "base/partials/preco.html" %}
+  <!-- Apresentação para visitantes -->
+  <section class="hero py-5">
+    <div class="container py-lg-5">
+      <div class="row align-items-center g-5">
+        <div class="col-lg-7">
+          <span class="badge rounded-pill text-bg-light text-primary mb-3">Projeto Integrador 2 · Univesp</span>
+          <h1 class="display-5 fw-bold mb-3">Encontre o menor preço do remédio do seu pet</h1>
+          <p class="lead mb-4">
+            Compare os preços de medicamentos veterinários em farmácias, pet shops,
+            agropecuárias e clínicas da sua região, registrados pela própria comunidade.
+          </p>
+          <div class="d-flex flex-wrap gap-2">
+            <button type="button" id="btn-home-register" class="btn btn-light btn-lg fw-semibold" data-abrir-autenticacao="register">
+              Criar conta grátis
+            </button>
+            <button type="button" id="btn-home-login" class="btn btn-outline-light btn-lg" data-abrir-autenticacao="login">
+              Já tenho conta
+            </button>
+          </div>
+        </div>
+        <div class="col-lg-5 d-none d-lg-block">
+          <!-- Ilustração: exemplo de resultado de pesquisa -->
+          <div class="card text-body border-0 shadow-lg" aria-hidden="true">
+            <div class="card-body p-4">
+              <p class="small text-body-secondary mb-1">Vermífugo para cães - 10 kg</p>
+              <div class="d-flex justify-content-between align-items-center p-3 rounded-3 mb-2" style="background: var(--cor-destaque-fundo)">
+                <span><i class="bi bi-trophy-fill me-2" style="color: var(--cor-destaque)"></i>Agropecuária A</span>
+                <strong style="color: var(--cor-destaque)">R$ 24,90</strong>
+              </div>
+              <div class="d-flex justify-content-between align-items-center p-3">
+                <span class="text-body-secondary">Pet shop B</span><strong>R$ 29,90</strong>
+              </div>
+              <div class="d-flex justify-content-between align-items-center p-3">
+                <span class="text-body-secondary">Clínica C</span><strong>R$ 35,00</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 
-      <!--Pesquisa Preços-->
-      {% include "base/partials/pesquisa.html" %}
-    {% endif %}
+  <section class="container py-5" aria-labelledby="como-funciona">
+    <h2 id="como-funciona" class="h3 fw-bold text-center mb-5">Como funciona</h2>
+    <div class="row g-4 text-center">
+      <div class="col-md-4">
+        <span class="passo-numero mb-3">1</span>
+        <h3 class="h6 fw-semibold">Cadastre locais e medicamentos</h3>
+        <p class="text-body-secondary small">Informe farmácias, pet shops, agropecuárias e clínicas da região (o CEP preenche o endereço) e os medicamentos com seus fabricantes.</p>
+      </div>
+      <div class="col-md-4">
+        <span class="passo-numero mb-3">2</span>
+        <h3 class="h6 fw-semibold">Registre os preços</h3>
+        <p class="text-body-secondary small">Viu um preço no pet shop ou na agropecuária? Registre para ajudar outros tutores.</p>
+      </div>
+      <div class="col-md-4">
+        <span class="passo-numero mb-3">3</span>
+        <h3 class="h6 fw-semibold">Pesquise e economize</h3>
+        <p class="text-body-secondary small">Veja todas as opções do medicamento do seu pet, com o menor preço em destaque.</p>
+      </div>
+    </div>
+  </section>
 
-    <!--Sobre-->
-    {% include "base/partials/sobre.html" %}
+{% endif %}
 
-  </body>
-</html>
+{% include "base/partials/sobre.html" %}
+{% endblock %}

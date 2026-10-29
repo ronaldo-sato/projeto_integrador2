@@ -1,43 +1,100 @@
-{% include "base/partials/head.html" %}
+{% extends "base/layout.html" %}
+{% load static %}
 
-  <body id="body" class="main-bg main-content">
-    
-    {% include "base/partials/message.html" %}
+{% block titulo %}Estabelecimentos{% endblock %}
 
-    <section id="lista-farmacias" class="main-content section-page">
-      <div>
-        <h3>Farmácias Cadastradas</h3>
+{% block conteudo %}
+<div class="container">
+  <header class="cabecalho-pagina d-flex align-items-center gap-3 mb-4">
+    <span class="icone-titulo" aria-hidden="true"><i class="bi bi-shop"></i></span>
+    <div>
+      <h1 class="mb-0">Estabelecimentos</h1>
+      <p class="text-body-secondary mb-0">Farmácias, pet shops, agropecuárias e clínicas onde os preços foram encontrados.</p>
+    </div>
+  </header>
+
+  <div class="row g-4">
+    <!-- Cadastro -->
+    <div class="col-lg-5 col-xl-4">
+      <div class="card">
+        <div class="card-header py-3"><i class="bi bi-plus-circle me-2 text-primary" aria-hidden="true"></i>Novo estabelecimento</div>
+        <div class="card-body">
+          <form id="formulario-farmacia" action="{% url 'farmacia:cadastrar' %}" method="POST">
+            {% csrf_token %}
+            {% include "farmacia/partials/campos_estabelecimento.html" %}
+            <button type="submit" class="btn btn-primary w-100">Cadastrar estabelecimento</button>
+          </form>
+        </div>
       </div>
-      <div>
-        <table class="tabela">
-          <thead>
-            <tr>
-              <th>Nome</th>
-              <th>Endereço</th>
-              <th>Ações</th>
-            </tr>
-          </thead>
+    </div>
 
-          <tbody>
-            {% for farmacia in farmacias %}
-            <tr>
-              <td>{{ farmacia.nome }}</td>
-              <td>{{ farmacia.endereco }}</td>
-              <td>
-                <a href="{% url 'farmacia:atualizar' farmacia.id %}" class="btn-editar" onclick="return confirm('ATENÇÃO: Deseja realmente EDITAR a farmácia &quot;{{ farmacia.nome }}&quot;?')">Editar</a>
-                <a href="{% url 'farmacia:deletar' farmacia.id %}" class="btn-excluir" onclick="return confirm('ATENÇÃO: Deseja realmente EXCLUIR a farmácia &quot;{{ farmacia.nome }}&quot;?')">Excluir</a>
-              </td>
-            </tr>
-            {% empty %}
-            <tr>
-              <td colspan="3" class="td-colspan">Nenhuma farmácia cadastrada até o momento.</td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-        <span class="span">{{ farmacias|length }} registros</span>
-        <a href="{% url 'base:index' %}" class="link-voltar">Voltar para a Home</a>
+    <!-- Lista -->
+    <div class="col-lg-7 col-xl-8">
+      <div class="card">
+        <div class="card-header py-3 d-flex flex-wrap gap-2 justify-content-between align-items-center">
+          <span>Estabelecimentos cadastrados <span class="badge rounded-pill text-bg-light ms-1">{{ farmacias|length }}</span></span>
+          {% if farmacias %}
+            <input type="search" class="form-control form-control-sm w-auto" placeholder="Filtrar..."
+                   aria-label="Filtrar estabelecimentos" data-filtrar-tabela="#tabela-farmacias" data-sem-resultado="#farmacias-sem-resultado">
+          {% endif %}
+        </div>
+        {% if farmacias %}
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0" id="tabela-farmacias">
+              <caption class="visually-hidden">Estabelecimentos cadastrados</caption>
+              <thead>
+                <tr>
+                  <th scope="col">Estabelecimento</th>
+                  <th scope="col">Endereço</th>
+                  <th scope="col" class="text-end">Ações</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for farmacia in farmacias %}
+                <tr>
+                  <td>
+                    <div class="fw-semibold">{{ farmacia.nome }}</div>
+                    <span class="badge rounded-pill badge-tipo badge-tipo-{{ farmacia.tipo }}">
+                      {% include "farmacia/partials/icone_tipo.html" with tipo=farmacia.tipo %} {{ farmacia.get_tipo_display }}
+                    </span>
+                    {% include "farmacia/partials/selo_mapa.html" with registrado=farmacia.registrado_mapa %}
+                    {% if farmacia.cnpj %}<div class="small text-body-secondary mt-1">CNPJ {{ farmacia.cnpj_formatado }}</div>{% endif %}
+                  </td>
+                  <td class="text-body-secondary">
+                    {{ farmacia.endereco }}
+                    {% if farmacia.cep %}<div class="small">CEP {{ farmacia.cep }}</div>{% endif %}
+                  </td>
+                  <td class="text-end text-nowrap">
+                    <a href="{% url 'farmacia:atualizar' farmacia.id %}" class="btn btn-sm btn-outline-secondary">
+                      <i class="bi bi-pencil" aria-hidden="true"></i> Editar
+                    </a>
+                    <!-- Exclusão só por POST, com confirmação (data-confirmar) -->
+                    <form action="{% url 'farmacia:deletar' farmacia.id %}" method="POST" class="d-inline"
+                          data-confirmar="Excluir &quot;{{ farmacia.nome }}&quot; ({{ farmacia.endereco }})? Os preços registrados nele também serão apagados.">
+                      {% csrf_token %}
+                      <button type="submit" class="btn btn-sm btn-outline-danger">
+                        <i class="bi bi-trash3" aria-hidden="true"></i> Excluir
+                      </button>
+                    </form>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          <p id="farmacias-sem-resultado" class="text-center text-body-secondary py-4 mb-0" hidden>Nenhum estabelecimento encontrado.</p>
+        {% else %}
+          <div class="card-body text-center py-5 estado-vazio">
+            <i class="bi bi-shop d-block mb-2" aria-hidden="true"></i>
+            Nenhum estabelecimento cadastrado ainda. Use o formulário ao lado para cadastrar o primeiro.
+          </div>
+        {% endif %}
       </div>
-    </section>
-  </body>
-</html>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'global/js/farmacia.js' %}"></script>
+{% endblock %}

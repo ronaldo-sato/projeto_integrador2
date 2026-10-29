@@ -1,43 +1,125 @@
-{% include "base/partials/head.html" %}
+{% extends "base/layout.html" %}
+{% load static %}
 
-  <body id="body" class="main-bg main-content">
+{% block titulo %}Medicamentos{% endblock %}
 
-    {% include "base/partials/message.html" %}
+{% block scripts %}
+<script src="{% static 'global/js/medicamento.js' %}"></script>
+{% endblock %}
 
-    <section id="lista-medicamento" class="main-content section-page">
-      <div>
-        <h3>Medicamentos Cadastrados</h3>
+{% block conteudo %}
+<div class="container">
+  <header class="cabecalho-pagina d-flex align-items-center gap-3 mb-4">
+    <span class="icone-titulo" aria-hidden="true"><i class="bi bi-capsule"></i></span>
+    <div>
+      <h1 class="mb-0">Medicamentos</h1>
+      <p class="text-body-secondary mb-0">Medicamentos veterinários. Cada um pode ter vários fabricantes (marcas).</p>
+    </div>
+  </header>
+
+  <div class="row g-4">
+    <!-- Cadastro -->
+    <div class="col-lg-4">
+      <div class="card">
+        <div class="card-header py-3"><i class="bi bi-plus-circle me-2 text-primary" aria-hidden="true"></i>Novo medicamento</div>
+        <div class="card-body">
+          <form id="formulario-medicamento" action="{% url 'medicamento:cadastrar' %}" method="POST">
+            {% csrf_token %}
+            <!-- value: após um erro, mantém o que o usuário digitou -->
+            <!-- Autocompletar: a cada letra, medicamento.js busca sugestões
+                 aproximadas (aceita erros de digitação) nos medicamentos já
+                 cadastrados e no catálogo de produtos registrados no MAPA -->
+            <div class="mb-3 position-relative">
+              <label for="nome-medicamento" class="form-label">Medicamento</label>
+              <input type="text" id="nome-medicamento" name="nome_medicamento" class="form-control" required
+                     maxlength="{{ max_nome }}" placeholder="Comece a digitar. Ex.: bravecto"
+                     autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false"
+                     aria-controls="lista-sugestoes" aria-describedby="ajuda-nome-medicamento"
+                     data-url-sugestoes="{% url 'medicamento:sugestoes' %}"
+                     value="{{ dados_medicamento.nome|default:'' }}">
+              <ul id="lista-sugestoes" class="list-group sugestoes shadow" role="listbox"
+                  aria-label="Sugestões de medicamentos" hidden></ul>
+              <div id="ajuda-nome-medicamento" class="form-text" aria-live="polite">
+                {% if catalogo_mapa %}
+                  Sugerimos produtos registrados no MAPA e os já cadastrados, mesmo com erros de digitação.
+                {% else %}
+                  Sugerimos os medicamentos já cadastrados. (O catálogo do MAPA ainda não foi importado.)
+                {% endif %}
+              </div>
+            </div>
+            <div class="mb-4">
+              <label for="fabricante" class="form-label">Fabricante (marca)</label>
+              <input type="text" id="fabricante" name="fabricante" class="form-control" required
+                     maxlength="{{ max_fabricante }}" placeholder="Preenchido ao escolher uma sugestão"
+                     value="{{ dados_medicamento.fabricante|default:'' }}">
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Cadastrar medicamento</button>
+          </form>
+        </div>
       </div>
-      <div>
-        <table class="tabela">
-          <thead>
-            <tr>
-              <th>Nome</th>
-              <th>Fabricante</th>
-              <th>Ações</th>
-            </tr>
-          </thead>
+    </div>
 
-          <tbody>
-            {% for medicamento in medicamentos %}
-            <tr>
-              <td>{{ medicamento.nome }}</td>
-              <td>{{ medicamento.fabricante }}</td>
-              <td>
-                <a href="{% url 'medicamento:atualizar' medicamento.id %}" class="btn-editar" onclick="return confirm('ATENÇÃO: Deseja realmente EDITAR o medicamento &quot;{{ medicamento.nome }}&quot;?')">Editar</a>
-                <a href="{% url 'medicamento:deletar' medicamento.id %}" class="btn-excluir" onclick="return confirm('ATENÇÃO: Deseja realmente EXCLUIR o medicamento &quot;{{ medicamento.nome }}&quot;?')">Excluir</a>
-              </td>
-            </tr>
-            {% empty %}
-            <tr>
-              <td colspan="3" class="td-colspan">Nenhum medicamento cadastrado até o momento.</td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-        <span class="span">{{ medicamentos|length }} registros</span>
-        <a href="{% url 'base:index' %}" class="link-voltar">Voltar para a Home</a>
+    <!-- Lista -->
+    <div class="col-lg-8">
+      <div class="card">
+        <div class="card-header py-3 d-flex flex-wrap gap-2 justify-content-between align-items-center">
+          <span>Medicamentos cadastrados <span class="badge rounded-pill text-bg-light ms-1">{{ medicamentos|length }}</span></span>
+          {% if medicamentos %}
+            <input type="search" class="form-control form-control-sm w-auto" placeholder="Filtrar..."
+                   aria-label="Filtrar medicamentos" data-filtrar-tabela="#tabela-medicamentos" data-sem-resultado="#medicamentos-sem-resultado">
+          {% endif %}
+        </div>
+        {% if medicamentos %}
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0" id="tabela-medicamentos">
+              <caption class="visually-hidden">Medicamentos cadastrados</caption>
+              <thead>
+                <tr>
+                  <th scope="col">Medicamento</th>
+                  <th scope="col">Fabricante</th>
+                  <th scope="col" class="text-end">Ações</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for medicamento in medicamentos %}
+                <tr>
+                  <td>
+                    <div class="d-flex align-items-center gap-3">
+                      {% include "medicamento/partials/ilustracao.html" with forma=medicamento.forma %}
+                      <div>
+                        <div class="fw-semibold">{{ medicamento.nome }}</div>
+                        <div class="small text-body-secondary">{{ medicamento.forma.rotulo }}</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td><span class="badge rounded-pill text-bg-light border">{{ medicamento.fabricante }}</span></td>
+                  <td class="text-end text-nowrap">
+                    <a href="{% url 'medicamento:atualizar' medicamento.id %}" class="btn btn-sm btn-outline-secondary">
+                      <i class="bi bi-pencil" aria-hidden="true"></i> Editar
+                    </a>
+                    <!-- Exclusão só por POST, com confirmação (data-confirmar) -->
+                    <form action="{% url 'medicamento:deletar' medicamento.id %}" method="POST" class="d-inline"
+                          data-confirmar="Excluir o medicamento &quot;{{ medicamento.nome }}&quot; ({{ medicamento.fabricante }})? Os preços registrados dele também serão apagados.">
+                      {% csrf_token %}
+                      <button type="submit" class="btn btn-sm btn-outline-danger">
+                        <i class="bi bi-trash3" aria-hidden="true"></i> Excluir
+                      </button>
+                    </form>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          <p id="medicamentos-sem-resultado" class="text-center text-body-secondary py-4 mb-0" hidden>Nenhum medicamento encontrado.</p>
+        {% else %}
+          <div class="card-body text-center py-5 estado-vazio">
+            <i class="bi bi-capsule d-block mb-2" aria-hidden="true"></i>
+            Nenhum medicamento cadastrado ainda. Use o formulário ao lado para cadastrar o primeiro.
+          </div>
+        {% endif %}
       </div>
-    </section>
-  </body>
-</html>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,1 +1,6 @@
 _*
+.env
+# A regra _* acima ignoraria os __init__.py, que o Python precisa
+!__init__.py
+staticfiles/
+.venv/
