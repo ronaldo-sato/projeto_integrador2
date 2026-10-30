@@ -103,6 +103,17 @@ class PesquisaLoginObrigatorioTests(TestCase):
         response = self.client.get(self.url_pesquisa, {'medicamento_nome': 'Dipirona Gotas'})
         self.assertEqual(response.context['forma'].rotulo, 'Gotas / colírio')
 
+    def teste_resultado_tem_link_do_google_maps(self):
+        """Garantir que cada estabelecimento do resultado tem o link para
+        abrir no Google Maps (no card de menor preço e na tabela)"""
+        self.client.login(username=self.username, password=self.password)
+        response = self.client.get(self.url_pesquisa, {'medicamento_nome': 'Dipirona'})
+
+        self.assertContains(
+            response,
+            'href="https://www.google.com/maps/search/?api=1&amp;query='
+            'Farm%C3%A1cia+Teste%2C+Rua+Teste%2C+1"', count=2)
+
     def teste_selo_registrado_no_mapa_no_resultado(self):
         """Garantir que o resultado indica os estabelecimentos com registro
         ativo no MAPA (pelo CNPJ) e só eles"""

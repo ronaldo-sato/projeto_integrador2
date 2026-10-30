@@ -63,6 +63,7 @@
                   <td class="text-body-secondary">
                     {{ farmacia.endereco }}
                     {% if farmacia.cep %}<div class="small">CEP {{ farmacia.cep }}</div>{% endif %}
+                    <div class="small mt-1">{% include "farmacia/partials/link_google_maps.html" with texto="Abrir no Google Maps" %}</div>
                   </td>
                   <td class="text-end text-nowrap">
                     <a href="{% url 'farmacia:atualizar' farmacia.id %}" class="btn btn-sm btn-outline-secondary">

@@ -718,3 +718,31 @@ class CadastroComCnpjTests(TestCase):
         response = self.client.get(reverse('farmacia:listar'))
         self.assertContains(response, 'Registrado no MAPA', count=1)
         self.assertContains(response, 'CNPJ ' + modulo_cnpj.formatar_cnpj(CNPJ_PET))
+
+
+# Link do Google Maps
+
+
+class LinkGoogleMapsTests(TestCase):
+
+    def setUp(self):
+        User.objects.create_user(username='usuario', password='senha_segura123')
+        self.client.login(username='usuario', password='senha_segura123')
+        self.farmacia = Farmacia.objects.create(
+            nome='Pet & Cia', endereco='Rua das Flores, 87 - Centro, São Paulo/SP')
+
+    def teste_link_do_google_maps_procura_nome_e_endereco(self):
+        """Garantir que o link abre a busca do Google Maps pelo nome e
+        endereço, com os caracteres especiais codificados"""
+        self.assertEqual(
+            self.farmacia.link_google_maps,
+            'https://www.google.com/maps/search/?api=1&query='
+            'Pet+%26+Cia%2C+Rua+das+Flores%2C+87+-+Centro%2C+S%C3%A3o+Paulo%2FSP')
+
+    def teste_lista_tem_link_do_google_maps(self):
+        """Garantir que cada estabelecimento da lista tem o link para abrir
+        no Google Maps"""
+        response = self.client.get(reverse('farmacia:listar'))
+
+        self.assertContains(response, 'Abrir no Google Maps')
+        self.assertContains(response, 'href="https://www.google.com/maps/search/?api=1&amp;query=Pet+%26+Cia')

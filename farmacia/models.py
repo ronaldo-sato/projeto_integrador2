@@ -1,3 +1,5 @@
+from urllib.parse import quote_plus
+
 from django.db import models
 
 # Create your models here.
@@ -76,6 +78,19 @@ class Farmacia(models.Model):
         """Nome com o bairro (ou o endereço), para diferenciar unidades da
         mesma rede nas listas de seleção"""
         return f'{self.nome} - {self.bairro or self.endereco}'
+
+    @property
+    def busca_google_maps(self):
+        """Texto procurado no Google Maps: nome + endereço, para abrir o
+        próprio estabelecimento (e não só a rua) quando o Google o conhece"""
+        return f'{self.nome}, {self.endereco}'
+
+    @property
+    def link_google_maps(self):
+        """Link que abre o estabelecimento no Google Maps (site ou app).
+        Não usa chave nem tem custo"""
+        return ('https://www.google.com/maps/search/?api=1&query='
+                + quote_plus(self.busca_google_maps))
 
 
 def montar_endereco(logradouro, numero, complemento, bairro, cidade, uf):

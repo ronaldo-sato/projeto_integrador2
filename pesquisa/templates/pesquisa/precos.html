@@ -52,7 +52,7 @@
                 {% for opcao in opcoes_menor_preco %}
                   <p class="mb-0">
                     <strong>{{ opcao.medicamento.fabricante }}</strong> em <strong>{{ opcao.farmacia.nome }}</strong> <span class="badge rounded-pill badge-tipo badge-tipo-{{ opcao.farmacia.tipo }} ms-1">{% include "farmacia/partials/icone_tipo.html" with tipo=opcao.farmacia.tipo %} {{ opcao.farmacia.get_tipo_display }}</span> {% include "farmacia/partials/selo_mapa.html" with registrado=opcao.registrado_mapa %}
-                    <span class="text-body-secondary">· {{ opcao.farmacia.endereco }}</span>
+                    <span class="text-body-secondary">· {{ opcao.farmacia.endereco }}</span> <span class="small">· {% include "farmacia/partials/link_google_maps.html" with farmacia=opcao.farmacia %}</span>
                   </p>
                 {% endfor %}
               </div>
@@ -97,7 +97,7 @@
                   </td>
                   <td>
                     <div>{{ preco.farmacia.nome }} <span class="badge rounded-pill badge-tipo badge-tipo-{{ preco.farmacia.tipo }} ms-1">{% include "farmacia/partials/icone_tipo.html" with tipo=preco.farmacia.tipo %} {{ preco.farmacia.get_tipo_display }}</span> {% include "farmacia/partials/selo_mapa.html" with registrado=preco.registrado_mapa %}</div>
-                    <div class="small text-body-secondary">{{ preco.farmacia.endereco }}</div>
+                    <div class="small text-body-secondary">{{ preco.farmacia.endereco }} · {% include "farmacia/partials/link_google_maps.html" with farmacia=preco.farmacia %}</div>
                   </td>
                   <td class="text-end valor">R$ {{ preco.preco }}</td>
                   <td class="text-body-secondary small text-nowrap d-none d-md-table-cell">{{ preco.data_hora|date:"d/m/Y H:i" }}</td>
